@@ -6,7 +6,7 @@ from joblib import dump
 from pathlib import Path
 
 data_folder = Path.home() / "MAM09A2" / "data" / "raw"
-models_folder = Path.home() / "models"
+models_folder = Path.home() / "MAM09A2" / "models"
 modelFileName = "linear_svc_octmnist.joblib"
 
 seed = 2
@@ -25,7 +25,7 @@ y_1d = np.squeeze(y)
 
 # fit the linear svc
 clf = make_pipeline(
-    StandardScaler(),
+    StandardScaler(with_mean=False),
     LinearSVC()
 )
 
