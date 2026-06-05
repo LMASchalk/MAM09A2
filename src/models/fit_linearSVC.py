@@ -3,12 +3,16 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 from joblib import dump
+from pathlib import Path
+
+data_folder = Path.home() / "MAM09A2" / "data" / "raw"
+models_folder = Path.home() / "models"
+modelFileName = "linear_svc_octmnist.joblib"
 
 seed = 2
-modelFileName = "linear_svc_octmnist"
 
 # Load the data
-data = np.load(r"data\raw\octmnist_224.npz")
+data = np.load(data_folder / "octmnist_224.npz")
 
 # Load the training data
 X_images = data["train_images"]
@@ -28,5 +32,5 @@ clf = make_pipeline(
 clf.fit(X_sub_flat, y_1d)
 
 # save the model
-dump(clf, f"models/{modelFileName}.joblib")
+dump(clf, models_folder / modelFileName)
 print("Model saved.")
