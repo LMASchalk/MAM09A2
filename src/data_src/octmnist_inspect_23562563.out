@@ -1,0 +1,43 @@
+# OCTMNIST inspection (size = 64)
+
+- Task: multi-class
+- Channels: 1
+- Class index -> name:
+    - 0: choroidal neovascularization
+    - 1: diabetic macular edema
+    - 2: drusen
+    - 3: normal
+
+## Split: train
+- Number of images: 97477  [OK]
+- Image array shape: (97477, 64, 64)
+- Image dtype: uint8
+- Pixel value range: [0, 255]
+- Label array shape: (97477, 1) (dtype uint8)
+- Class counts: choroidal neovascularization=33484, diabetic macular edema=10213, drusen=7754, normal=46026
+- Class proportions (%): choroidal neovascularization=34.4, diabetic macular edema=10.5, drusen=8.0, normal=47.2
+
+## Split: val
+- Number of images: 10832  [OK]
+- Image array shape: (10832, 64, 64)
+- Image dtype: uint8
+- Pixel value range: [0, 255]
+- Label array shape: (10832, 1) (dtype uint8)
+- Class counts: choroidal neovascularization=3721, diabetic macular edema=1135, drusen=862, normal=5114
+- Class proportions (%): choroidal neovascularization=34.4, diabetic macular edema=10.5, drusen=8.0, normal=47.2
+
+## Split: test
+- Number of images: 1000  [OK]
+- Image array shape: (1000, 64, 64)
+- Image dtype: uint8
+- Pixel value range: [0, 255]
+- Label array shape: (1000, 1) (dtype uint8)
+- Class counts: choroidal neovascularization=250, diabetic macular edema=250, drusen=250, normal=250
+- Class proportions (%): choroidal neovascularization=25.0, diabetic macular edema=25.0, drusen=25.0, normal=25.0
+
+## Notes
+- Train imbalance ratio (largest / smallest class): 5.9x
+- Test set across classes: balanced (counts: [250, 250, 250, 250])
+- Implication: report per-class / macro metrics (balanced accuracy, macro-AUC), not plain accuracy alone, because the model trains under imbalance but is tested on a balanced set.
+
+[done] report and figures written to: /gpfs/home1/scur0334/MAM09A2/reports
