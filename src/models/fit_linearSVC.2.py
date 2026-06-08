@@ -1,7 +1,7 @@
 """
 LinearSVC baseline for the OCTMNIST classification project.
 
-Flattened 64x64 grayscale images -> MInMaxScaler -> PCA -> LinearSVC.
+Flattened 28x28 grayscale images -> MInMaxScaler -> LinearSVC.
 
 C is tuned on the official validation split (not k-fold cross-validation).
 Test set is touched exactly once.
@@ -31,7 +31,7 @@ matplotlib.use("Agg")  # headless backend for the cluster (no display)
 
 
 # Configuration 
-SIZE = 64
+SIZE = 28
 C_GRID = [0.001, 0.01, 0.1, 1.0, 10.0]
 MAX_ITER = 5000
 SEED = 42
@@ -151,9 +151,8 @@ def write_report(path, best_c, sweep, test_metrics):
     refit_on = "train+val" if REFIT_ON_TRAINVAL else "train"
     lines = [f"# LinearSVC baseline (OCTMNIST {SIZE}x{SIZE})\n"]
     lines.append("## Setup")
-    lines.append(f"- Input features: {SIZE * SIZE} flattened pixels, "
-                 f"reduced to {PCA_COMPONENTS} PCA components")
-    lines.append(f"- Pipeline: MinMaxScaler -> PCA({PCA_COMPONENTS}) -> LinearSVC")
+    lines.append(f"- Input features: {SIZE * SIZE} flattened pixels")
+    lines.append(f"- Pipeline: MinMaxScaler -> LinearSVC")
     lines.append(f"- LinearSVC: class_weight='balanced', dual=False, "
                  f"max_iter={MAX_ITER}, random_state={SEED}")
     lines.append(f"- C selected on validation by: {SELECTION_METRIC}")
