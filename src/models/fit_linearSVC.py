@@ -18,7 +18,6 @@ from joblib import dump
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, label_binarize
 from sklearn.svm import LinearSVC
-from sklearn.decomposition import PCA
 from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
@@ -40,7 +39,6 @@ SEED = 42
 SELECTION_METRIC = "balanced_accuracy"
 REFIT_ON_TRAINVAL = True
 DOWNLOAD_IF_MISSING = False
-PCA_COMPONENTS = 400
 
 
 # Paths and labels
@@ -89,7 +87,6 @@ def build_model(c):
     #   random_state            -> reproducibility
     return Pipeline([
         ("scale", MinMaxScaler()),
-        ("pca", PCA(n_components=PCA_COMPONENTS, random_state=SEED)),
         ("svc", LinearSVC(
             C=c,
             class_weight="balanced",
