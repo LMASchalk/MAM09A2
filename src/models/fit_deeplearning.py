@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import argparse
 from pathlib import Path
 
-from utils import npz_filename, OCTMNISTDataset,SimpleCNN,train_one_epoch,evaluate
+from utils import npz_filename, OCTMNISTDataset,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves
 
 # All the important paths 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -120,6 +120,10 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=lr)    
     print(f"The optimizer is: {optimizer}")
     
+    # To generate a figure of the loss over the training
+    train_losses, val_losses = [], []
+    train_accs,  val_accs  = [], []    
+    
     # Training loop
     print("Initializing training loop ...")
     for epoch in range(num_epochs):
@@ -139,12 +143,26 @@ def main():
             criterion,
             device
         )
-
+        
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
+        train_accs.append(train_acc)
+        val_accs.append(val_acc)        
+        
         print(
             f"Epoch [{epoch+1}/{num_epochs}] "
             f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f} "
             f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}"
         )    
+    
+    plot_learning_curves(
+        train_losses=train_losses,
+        val_losses=val_losses,
+        train_accs=train_accs,
+        val_accs=val_accs,
+        model_name=name,
+        reports_dir=REPORTS_DIR
+    )
     
     # Evaluate the test set
     test_loss, test_acc = evaluate(model, test_loader, criterion, device)
@@ -153,6 +171,6 @@ def main():
     model_file = MODELS_DIR / f"{name}.pt"
     torch.save(model.state_dict(), model_file)
     print(f"Model saved to: {model_file}")
-        
+
 if __name__ == "__main__":
     main()

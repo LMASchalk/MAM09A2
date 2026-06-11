@@ -136,5 +136,50 @@ def npz_filename(size):
     if size == 28:
         return "octmnist.npz"
     return f"octmnist_{size}.npz"
+
+def plot_learning_curves(train_losses, val_losses, train_accs, val_accs, model_name, reports_dir):
+    """
+    Make a figure with loss and accuracy curves and save to REPORTS_DIR.
+    
+    Args:
+        train_losses (list of float): training loss per epoch
+        val_losses   (list of float): validation loss per epoch
+        train_accs   (list of float): training accuracy per epoch
+        val_accs     (list of float): validation accuracy per epoch
+        model_name   (str): name for the model (used in filename/title)
+        reports_dir  (Path): directory where the figure will be saved
+    """
+    epochs = range(1, len(train_losses) + 1)
+
+    plt.figure(figsize=(10, 4))
+
+    # ---- Loss subplot ----
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, train_losses, label="Train Loss")
+    plt.plot(epochs, val_losses, label="Val Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Loss vs. Epoch")
+    plt.legend()
+    plt.grid(True)
+
+    # ---- Accuracy subplot ----
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, train_accs, label="Train Acc")
+    plt.plot(epochs, val_accs, label="Val Acc")
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.title("Accuracy vs. Epoch")
+    plt.legend()
+    plt.grid(True)
+
+    plt.suptitle(f"Learning Curves: {model_name}")
+    plt.tight_layout()
+
+    save_path = reports_dir / f"{model_name}_learning_curves.png"
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+    print(f"Learning curves saved to: {save_path}")
+
 if __name__ == "__main__":
     main()
