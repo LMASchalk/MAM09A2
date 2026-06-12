@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import argparse
 from pathlib import Path
 
-from utils import npz_filename, OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves
+from utils import npz_filename, OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves,find_availableName,EarlyStopping
 
 # All the important paths 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -130,8 +130,13 @@ def main():
     
     criterion = nn.CrossEntropyLoss()
     print(f"The loss function is: {criterion}")
-    optimizer = optim.Adam(model.parameters(), lr=lr)    
+    optimizer = optim.Adam(
+        model.parameters(),
+        lr=lr,
+        weight_decay=1e-4
+    )
     print(f"The optimizer is: {optimizer}")
+    early_stopping = EarlyStopping(patience=5, delta=0.01)
     
     # To generate a figure of the loss over the training
     train_losses, val_losses = [], []
@@ -167,34 +172,38 @@ def main():
             f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f} "
             f"Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}"
         )    
+        
+        # Detect early stopping
+        early_stopping(val_loss, model,epoch)
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
     
-    plot_learning_curves(
-        train_losses=train_losses,
-        val_losses=val_losses,
-        train_accs=train_accs,
-        val_accs=val_accs,
-        model_name=name,
-        reports_dir=REPORTS_DIR
-    )
+    # Load the best model of the epochs
+    print(f"Best model was from epoch {early_stopping.best_epoch + 1}") 
+    early_stopping.load_best_model(model)
     
     # Evaluate the test set
     test_loss, test_acc = evaluate(model, test_loader, criterion, device)
     print(f"Test Loss: {test_loss:.4f} | Test Acc: {test_acc:.4f}")
 
     # Save model file and ensure that it does not overwrite existing files.
-    model_file = MODELS_DIR / f"{name}_{modeltype}.pt"
-    if model_file.exists():
-        i = 1
-        # Continue endlessly until finds an empty name slot.
-        while True:
-            new_file_name = MODELS_DIR / f"{name}_{modeltype}_{i}.pt"
-            if not new_file_name.exists():
-                model_file = new_file_name
-                break
-            i += 1
-            
-    torch.save(model.state_dict(), model_file)
-    print(f"Model saved to: {model_file}")
+    fileName = find_availableName(MODELS_DIR,f"{name}_{modeltype}.pt")
+    savePATH = MODELS_DIR / fileName    
+    torch.save(model.state_dict(), savePATH)
+    print(f"Model saved to: {savePATH}")
+
+    # Creates a visual on the training loss and accuracy over epochs
+    p = Path(fileName)
+    plot_learning_curves(
+        train_losses=train_losses,
+        val_losses=val_losses,
+        train_accs=train_accs,
+        val_accs=val_accs,
+        best_epoch = early_stopping.best_epoch + 1,
+        saveName=p.stem,
+        reports_dir=REPORTS_DIR
+    )   
 
 if __name__ == "__main__":
     main()
