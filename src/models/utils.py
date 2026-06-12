@@ -46,26 +46,49 @@ class OCTMNISTDataset(Dataset):
 
         return img, label
 
+class SimpleMLP(nn.Module):
+    def __init__(self, num_classes: int = 4, image_size: int = 28, hidden_dim: int = 512,hidden_dim2: int = 256):
+        super().__init__()
+        
+        input_vector_size = image_size * image_size
+        self.layers = nn.Sequential(
+            # Simple architecture. Two fully connected layers of ReLu activation
+            nn.Flatten(),
+            
+            nn.Linear(input_vector_size, hidden_dim),
+            nn.ReLU(inplace=True),
+            
+            nn.Linear(hidden_dim,hidden_dim2),
+            nn.ReLU(inplace=True),
+            
+            # Classification part to num classes of logits 
+            nn.Linear(hidden_dim2, num_classes)
+        )
+
+    def forward(self, x):
+        return self.layers(x)
+
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes: int = 4, channel_size = 32, image_size  = 28):  
         super().__init__()
         
         # This defines the feature extraction process of a CNN. This learns features such as lines patterns etc from images 
-        self.features = nn.Sequential(
-            nn.Conv2d(1, channel_size, kernel_size=3, padding=1),  # (B, 1, H, W) -> (B, 32, H, W)
+        self.features = nn.Sequential(  
+            nn.Conv2d(1, channel_size, kernel_size=3, padding=1),  
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2),                 # (B, 32, H/2, W/2)
+            nn.MaxPool2d(kernel_size=2),                 
 
-            nn.Conv2d(channel_size, channel_size * 2, kernel_size=3, padding=1), # (B, 64, H/2, W/2)
+            nn.Conv2d(channel_size, channel_size * 2, kernel_size=3, padding=1), 
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=2),                 # (B, 64, H/4, W/4)
+            nn.MaxPool2d(kernel_size=2)              
         )
 
+        # This prepares the last step of classifying
         self.classifier = nn.Sequential(
             nn.Flatten(),
             nn.Linear(channel_size * 2 * image_size//4 * image_size//4 , 128),  
             nn.ReLU(inplace=True),
-            nn.Linear(128, num_classes),
+            nn.Linear(128, num_classes)
         )
 
     def forward(self, x):
@@ -82,8 +105,9 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
     running_correct = 0
     total = 0
 
+    # Loops over all batches in the entire dataset Thus images contains a batch size amount of images.
     for images, labels in loader:
-        # Puts the images on the GPU
+        # Puts the images (BatchSize,1,W,H) on the GPU
         images = images.to(device, non_blocking=True)
         labels = labels.to(device, non_blocking=True)
 

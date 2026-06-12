@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import argparse
 from pathlib import Path
 
-from utils import npz_filename, OCTMNISTDataset,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves
+from utils import npz_filename, OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves
 
 # All the important paths 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -21,15 +21,22 @@ def parse_args():
     parser.add_argument(
         "--size",
         type=int,
-        default=28,          # fallback if you don't pass --size
+        default=28,          
         help="Image size to use for OCTMNIST. Choices are: 244,128,64,28 (Default)",
     )
     
     parser.add_argument(
         "--modelname",
         type=str,
-        default="linear_svc_octmnist",          # fallback if you don't pass --size
+        default="MAM09A2",          
         help="The name of the saved model. Default: linear_svc_octmnist",
+    )
+
+    parser.add_argument(
+        "--modeltype",
+        type=str,
+        default="MLP",          
+        help="The type of deep learning model, Options: MLP (Default), CNN",
     )
     
     parser.add_argument(
@@ -74,6 +81,7 @@ def main():
     args = parse_args()
     size = args.size
     name = args.modelname
+    modeltype = args.modeltype
     batch_size = args.batch_size
     lr = args.lr
     num_epochs = args.epochs    
@@ -113,8 +121,13 @@ def main():
     
     # Initialize the model and optimizer
     num_classes = 4  
-    model = SimpleCNN(num_classes=num_classes,image_size = size).to(device)  
-    print("CNN Initialized!")  
+    if modeltype == "MLP":
+        model = SimpleMLP(num_classes=num_classes,image_size = size).to(device)  
+        print("MLP Initialized!") 
+    elif modeltype == "CNN":
+        model = SimpleCNN(num_classes=num_classes,image_size = size).to(device)  
+        print("CNN Initialized!")  
+    
     criterion = nn.CrossEntropyLoss()
     print(f"The loss function is: {criterion}")
     optimizer = optim.Adam(model.parameters(), lr=lr)    
@@ -168,7 +181,18 @@ def main():
     test_loss, test_acc = evaluate(model, test_loader, criterion, device)
     print(f"Test Loss: {test_loss:.4f} | Test Acc: {test_acc:.4f}")
 
-    model_file = MODELS_DIR / f"{name}.pt"
+    # Save model file and ensure that it does not overwrite existing files.
+    model_file = MODELS_DIR / f"{name}_{modeltype}.pt"
+    if model_file.exists():
+        i = 1
+        # Continue endlessly until finds an empty name slot.
+        while True:
+            new_file_name = MODELS_DIR / f"{name}_{modeltype}_{i}.pt"
+            if not new_file_name.exists():
+                model_file = new_file_name
+                break
+            i += 1
+            
     torch.save(model.state_dict(), model_file)
     print(f"Model saved to: {model_file}")
 
