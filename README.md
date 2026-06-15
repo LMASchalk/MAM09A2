@@ -118,3 +118,7 @@ Drusen are extracellular deposits of lipids, proteins and other debris and often
 </p>
 
 *source: https://www.scienceofamd.org/learn/*
+
+## How to run
+### Environment setup. 
+
