@@ -5,6 +5,14 @@
 
 ### Conventional machine learning
 
+For the conventional machine learning approach a Linear Support Vector Classifier (LinearSVC) was used. Each 28x28 grayscale image is flattened into a single vector of 784 pixel values, which forms the input to the model.
+
+Before classification the pixel values are rescaled with a `MinMaxScaler`, which linearly maps each feature to the range [0, 1] using the minimum and maximum seen in the training data. ~~Scaling matters because a support vector machine positions its decision boundary using distances between points, so the default of feeding raw pixels straight in would let the features with the largest values dominate the margin and distort the fit. MinMaxScaler was chosen over the common alternative (StandardScaler) because pixel intensities are already bounded and non-negative (0-255): mapping them to [0, 1] preserves that structure and keeps zero pixels at zero, whereas standardising would introduce negative values and assume a roughly Gaussian spread that pixel data does not have.~~ The scaler sits inside a pipeline together with the classifier, so it is fitted on the training data only and the same transformation is reused on the validation and test data.
+
+The LinearSVC then learns a linear decision boundary for each of the four classes in a one-vs-rest fashion, separating each class from the rest with the largest possible margin. A few settings were changed from their defaults. The parameter `class_weight` is set to `"balanced"` rather than the default, which treats every class equally. This scales each class's penalty inversely to how often it appears, so mistakes on the rare classes such as drusen count for more and the model is not pulled towards the common classes. The parameter `dual` is set to `False` instead of letting it be chosen automatically, which solves the primal form of the optimisation rather than the dual. This is the recommended and faster option when there are many more samples than features, as is the case here with far more images than the 784 pixel features. ~~The parameter `random_state` is fixed to a set value (42) rather than left unseeded, so the solver's internal randomness is deterministic and the same model is produced on every run.~~ Finally, `max_iter` is raised to 5000 from its default of 1000. This represents the cap on the number of solver iterations before it stops, and the higher cap gives the solver enough room to converge on this data, avoiding the convergence warning that the default can produce on the larger train+val refit.
+
+The regularisation strength `C`, which controls the trade-off between a wide margin and misclassifying training points, is the only hyperparameter that is tuned. Five candidate values spanning several orders of magnitude (0.001, 0.01, 0.1, 1.0 and 10.0) are each fitted on the training split and scored on the official validation split, and the value giving the best balanced accuracy is kept~~, rather than tuning with k-fold cross-validation, since the dataset already provides a dedicated validation set~~. The model with the best C is then refitted on the combined training and validation data, and the held-out test set is scored exactly once using the same shared metrics module as the CNN (accuracy, macro one-vs-rest AUC, macro-F1 and per-class recall), so the two models are directly comparable.
+
 ### Deep learning 
 For the deep learning approach a Convolutional Neural Net (CNN) was used. It consists of a simple architecture of two feature extraction blocks (nn.Conv2d + nn.ReLU + nn.MaxPool2d) and a classifier block (nn.Flatten + nn.Linear + nn.ReLU + nn.Linear). See below for an overview of the architecture. 
 
@@ -59,20 +67,20 @@ training data.
 
 | Metric | LinearSVC baseline | CNN |
 |---|---|---|
-| Accuracy (ACC) | _tbd_ | _tbd_ |
-| AUC (micro, OvR) | _tbd_ | _tbd_ |
-| Macro-F1 | _tbd_ | _tbd_ |
+| Accuracy (ACC) | 0.3760 | 0.6780 |
+| AUC (micro, OvR) | 0.6393 | 0.9229 |
+| Macro-F1 | 0.2588 | 0.6434 |
 
 Per-class recall:
 
 | Class | LinearSVC baseline | CNN |
 |---|---|---|
-| CNV | _tbd_ | _tbd_ |
-| DME | _tbd_ | _tbd_ |
-| drusen | _tbd_ | _tbd_ |
-| normal | _tbd_ | _tbd_ |
+| CNV | 0.7160 | 0.9640 |
+| DME | 0.0160 | 0.6200 |
+| drusen | 0.0000 | 0.2120 |
+| normal | 0.7720 | 0.9160 |
 
-Confusion matrices for both models are saved under `reports/figures/`.
+~~Confusion matrices for both models are saved under `reports/figures/`.~~
 
 ### The different classifications
 The dataset contains four classifications: choroidal neovascularization (CNV), diabetic macular edema (DME), drusen and normal. An example from the dataset of each class can be seen below. An explanation and a showcase presentation on OCT of each condition can also be seen below. 
