@@ -9,6 +9,8 @@ from pathlib import Path
 
 from utils import npz_filename, OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves,find_availableName,EarlyStopping
 
+import metrics
+
 # All the important paths 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = REPO_ROOT / "data" / "raw"
@@ -29,7 +31,7 @@ def parse_args():
         "--modelname",
         type=str,
         default="MAM09A2",          
-        help="The name of the saved model. Default: linear_svc_octmnist",
+        help="The name of the saved model. Default: MAM09A2",
     )
 
     parser.add_argument(
@@ -183,9 +185,11 @@ def main():
     print(f"Best model was from epoch {early_stopping.best_epoch + 1}") 
     early_stopping.load_best_model(model)
     
-    # Evaluate the test set
-    test_loss, test_acc = evaluate(model, test_loader, criterion, device)
-    print(f"Test Loss: {test_loss:.4f} | Test Acc: {test_acc:.4f}")
+    # Evaluate the test set with the shared metrics module so the deep learning
+    # model reports the same four metrics as the LinearSVC baseline:
+    # accuracy, macro one-vs-rest AUC, macro F1, and per-class recall.
+    test_metrics = metrics.evaluate_torch(model, test_loader, device)
+    print(metrics.format_metrics(test_metrics))
 
     # Save model file and ensure that it does not overwrite existing files.
     fileName = find_availableName(MODELS_DIR,f"{name}_{modeltype}.pt")

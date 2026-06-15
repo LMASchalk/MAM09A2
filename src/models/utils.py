@@ -270,6 +270,3 @@ def find_availableName(FOLDER_PATH,fileName) -> str:
                 fileName = newFileName 
                 return fileName 
             i += 1
-        
-if __name__ == "__main__":
-    main()
