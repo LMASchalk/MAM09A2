@@ -120,5 +120,16 @@ Drusen are extracellular deposits of lipids, proteins and other debris and often
 *source: https://www.scienceofamd.org/learn/*
 
 ## How to run
+These instructions apply specifically to the UvA Snellius server
 ### Environment setup. 
+1. Pull the following repository: https://github.com/uvadlc/uvadlc_practicals_20252
+2. Then run sbatch src/bashrunscripts/install_environment.job
 
+### Downloading the dataset
+Run sbatch src/bashrunscripts/make_dataset.job
+
+### Training for machine learning
+Run sbatch src/bashrunscripts/fit_linearSVC.job
+
+### Training for Deep learning 
+Run sbatch src/bashrunscripts/fit_deeplearning.job
