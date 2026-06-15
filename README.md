@@ -13,10 +13,14 @@ The LinearSVC then learns a linear decision boundary for each of the four classe
 
 The regularisation strength `C`, which controls the trade-off between a wide margin and misclassifying training points, is the only hyperparameter that is tuned. Five candidate values spanning several orders of magnitude (0.001, 0.01, 0.1, 1.0 and 10.0) are each fitted on the training split and scored on the official validation split, and the value giving the best balanced accuracy is kept~~, rather than tuning with k-fold cross-validation, since the dataset already provides a dedicated validation set~~. The model with the best C is then refitted on the combined training and validation data, and the held-out test set is scored exactly once using the same shared metrics module as the CNN (accuracy, macro one-vs-rest AUC, macro-F1 and per-class recall), so the two models are directly comparable.
 
-### Deep learning 
+### Deep learning
+For the classification task two different Deep Learning archetypes were used, MultiLayer Perceptron and Convolutional Neural Network. The specifics of how the two archetypes are implemented will be discussed in the next sections. The optimizer, loss function and regularization are the same for both experiments. **Optimizer: Adam** (Often used since it is computationally efficient and able to deal with pathological curvatures in the gradient. However, Adam does often tend to find minima that are more extreme and other optimizers such as stochastic gradient descent with momentum often find more flatter minima which is leads to better generalisation), **Loss function: CrossEntropy** (Good for classification due to the shape of the loss function exploding at 0) and **Regularization: Early stopping and L2**. 
+
+#### MultiLayer Perceptron
+A MultiLayer Perceptron (MLP) is the simplest for of a neural net. Ours consist of two fully connected ReLu layers. With the first layer containing 512 hidden units and the second layer containing 256 hidden units. These numbers were chosen in order to roughly match the amount of weights in the CNN running on 28x28 images. 
+
+#### Convolutional Neural Network
 For the deep learning approach a Convolutional Neural Net (CNN) was used. It consists of a simple architecture of two feature extraction blocks (nn.Conv2d + nn.ReLU + nn.MaxPool2d) and a classifier block (nn.Flatten + nn.Linear + nn.ReLU + nn.Linear). See below for an overview of the architecture. 
-
-
 
 The feature extraction blocks finds features within the image, in this case set to 32 at the first block and 64 at the second. These are patterns in the images that are learnt, for instance lines, shapes etc. For a single image you can extract these features and see them in a feature map, see image below. 
 
@@ -122,3 +126,18 @@ Drusen are extracellular deposits of lipids, proteins and other debris and often
 </p>
 
 *source: https://www.scienceofamd.org/learn/*
+
+## How to run
+These instructions apply specifically to the UvA Snellius server
+### Environment setup. 
+1. Pull the following repository: https://github.com/uvadlc/uvadlc_practicals_20252
+2. Then run sbatch src/bashrunscripts/install_environment.job
+
+### Downloading the dataset
+Run sbatch src/bashrunscripts/make_dataset.job
+
+### Training for machine learning
+Run sbatch src/bashrunscripts/fit_linearSVC.job
+
+### Training for Deep learning 
+Run sbatch src/bashrunscripts/fit_deeplearning.job
