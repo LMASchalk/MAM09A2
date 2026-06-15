@@ -5,10 +5,14 @@
 
 ### Conventional machine learning
 
-### Deep learning 
+### Deep learning
+For the classification task two different Deep Learning archetypes were used, MultiLayer Perceptron and Convolutional Neural Network. The specifics of how the two archetypes are implemented will be discussed in the next sections. The optimizer, loss function and regularization are the same for both experiments. **Optimizer: Adam** (Often used since it is computationally efficient and able to deal with pathological curvatures in the gradient. However, Adam does often tend to find minima that are more extreme and other optimizers such as stochastic gradient descent with momentum often find more flatter minima which is leads to better generalisation), **Loss function: CrossEntropy** (Good for classification due to the shape of the loss function exploding at 0) and **Regularization: Early stopping and L2**. 
+
+#### MultiLayer Perceptron
+A MultiLayer Perceptron (MLP) is the simplest for of a neural net. Ours consist of two fully connected ReLu layers. With the first layer containing 512 hidden units and the second layer containing 256 hidden units. These numbers were chosen in order to roughly match the amount of weights in the CNN running on 28x28 images. 
+
+#### Convolutional Neural Network
 For the deep learning approach a Convolutional Neural Net (CNN) was used. It consists of a simple architecture of two feature extraction blocks (nn.Conv2d + nn.ReLU + nn.MaxPool2d) and a classifier block (nn.Flatten + nn.Linear + nn.ReLU + nn.Linear). See below for an overview of the architecture. 
-
-
 
 The feature extraction blocks finds features within the image, in this case set to 32 at the first block and 64 at the second. These are patterns in the images that are learnt, for instance lines, shapes etc. For a single image you can extract these features and see them in a feature map, see image below. 
 
