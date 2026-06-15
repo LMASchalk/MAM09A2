@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#SBATCH --partition=rome
+#SBATCH --gpus=1
+#SBATCH --mem=32G   
+#SBATCH --job-name=FitLinearSVC
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=9
+#SBATCH --time=04:00:00
+#SBATCH --output=slurm_makedataset_%A.out
+
+# Clean environment and load modules
+module purge
+module load 2025
+module load Anaconda3/2025.06-1
+
+# Activate your environment (the one that has medmnist installed)
+eval "$(conda shell.bash hook)"
+conda activate dl2025
+
+# Go to your project directory
+cd $HOME/MAM09A2
+
+# Run your script
+python src/models/fit_linearSVC.py 
