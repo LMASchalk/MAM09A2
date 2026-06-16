@@ -81,6 +81,47 @@ The training and validation sets are class-imbalanced (47.2% normal, 34.4% CNV, 
 
 MedMNIST provides the images already centre-cropped and resized to a fixed square resolution (we use 28×28) with intensities as 8-bit grayscale; "preprocessed" here refers to that standardisation from the original heterogeneous OCT scans. Our pipeline adds only the model-specific steps applied per split: flattening and feature scaling for the classical baseline, and tensor conversion with normalisation to [0, 1] for the network.**!!!**
 
+### The different classifications
+The dataset contains four classifications: choroidal neovascularization (CNV), diabetic macular edema (DME), drusen and normal. An example from the dataset of each class can be seen below. An explanation and a showcase presentation on OCT of each condition can also be seen below. 
+
+<img src="reports\figures\DifferentClassesShowcase.png" alt="DifferentClassesShowcase.png">
+
+####  choroidal neovascularization (CNV)
+This condition occurs when new abnormal vessels grow from the choroid into the retinal pigment epithelium (RPE), see the figure below. On OCT this shows as a localized elevation of the RPE by an hyperreflective mass.
+
+<p float="left">
+  <img src="reports/figures/neovascularization_hero-2940749225.jpg"
+       alt="Choroidal neovascularization photo" width="45%" />
+  <img src="reports/figures/choroidalNeovascularization.png"
+       alt="Choroidal neovascularization on OCT" width="45%" />
+</p>
+
+*source:  https://www.allaboutvision.com/conditions/choroidal-neovascularization-cnv/* 
+
+#### diabetic macular edema (DME)
+This condition occurs due to leakage from existing retinal capillaries in the macula due to diabetes, see figure below. The leakage causes fluid to build up between the retinal layers, which can be seen on OCT as a spongy structure. 
+
+<p float="left">
+  <img src="reports\figures\Diabetic_Macular_Edema.jpg"
+       alt="Choroidal neovascularization photo" width="45%" />
+  <img src="reports\figures\diabeticMacularEdema.png"
+       alt="Choroidal neovascularization on OCT" width="45%" />
+</p>
+
+*source: https://eyewiki.org/Diabetic_Macular_Edema/*
+
+#### drusen
+Drusen are extracellular deposits of lipids, proteins and other debris and often presents between bruch's membreme and the RPE, see the figure below. Drusen are a marker and mediator of age-related macular degeneration, since they can cause dysregulation of the RPE. On OCT drusen present as small bumps along the RPE. 
+
+<p float="left">
+  <img src="reports\figures\drusen.jpg"
+       alt="drusen photo" width="45%" />
+  <img src="reports\figures\drusenOCT.png"
+       alt="drusen on OCT" width="45%" />
+</p>
+
+*source: https://www.scienceofamd.org/learn/*
+
 ## Final Evaluation on the Test Set
 
 Both models are evaluated on the official MedMNIST test set (1,000 images,
@@ -133,46 +174,6 @@ Per-class recall:
 
 ~~Confusion matrices for both models are saved under `reports/figures/`.~~
 
-### The different classifications
-The dataset contains four classifications: choroidal neovascularization (CNV), diabetic macular edema (DME), drusen and normal. An example from the dataset of each class can be seen below. An explanation and a showcase presentation on OCT of each condition can also be seen below. 
-
-<img src="reports\figures\DifferentClassesShowcase.png" alt="DifferentClassesShowcase.png">
-
-####  choroidal neovascularization (CNV)
-This condition occurs when new abnormal vessels grow from the choroid into the retinal pigment epithelium (RPE), see the figure below. On OCT this shows as a localized elevation of the RPE by an hyperreflective mass.
-
-<p float="left">
-  <img src="reports/figures/neovascularization_hero-2940749225.jpg"
-       alt="Choroidal neovascularization photo" width="45%" />
-  <img src="reports/figures/choroidalNeovascularization.png"
-       alt="Choroidal neovascularization on OCT" width="45%" />
-</p>
-
-*source:  https://www.allaboutvision.com/conditions/choroidal-neovascularization-cnv/* 
-
-#### diabetic macular edema (DME)
-This condition occurs due to leakage from existing retinal capillaries in the macula due to diabetes, see figure below. The leakage causes fluid to build up between the retinal layers, which can be seen on OCT as a spongy structure. 
-
-<p float="left">
-  <img src="reports\figures\Diabetic_Macular_Edema.jpg"
-       alt="Choroidal neovascularization photo" width="45%" />
-  <img src="reports\figures\diabeticMacularEdema.png"
-       alt="Choroidal neovascularization on OCT" width="45%" />
-</p>
-
-*source: https://eyewiki.org/Diabetic_Macular_Edema/*
-
-#### drusen
-Drusen are extracellular deposits of lipids, proteins and other debris and often presents between bruch's membreme and the RPE, see the figure below. Drusen are a marker and mediator of age-related macular degeneration, since they can cause dysregulation of the RPE. On OCT drusen present as small bumps along the RPE. 
-
-<p float="left">
-  <img src="reports\figures\drusen.jpg"
-       alt="drusen photo" width="45%" />
-  <img src="reports\figures\drusenOCT.png"
-       alt="drusen on OCT" width="45%" />
-</p>
-
-*source: https://www.scienceofamd.org/learn/*
 
 ## How to run
 These instructions apply specifically to the UvA Snellius server
