@@ -194,7 +194,7 @@ def main():
     # Save model file and ensure that it does not overwrite existing files.
     fileName = find_availableName(MODELS_DIR,f"{name}_{modeltype}.pt")
     savePATH = MODELS_DIR / fileName    
-    torch.save(model.state_dict(), savePATH)
+    torch.save(model, savePATH)
     print(f"Model saved to: {savePATH}")
 
     # Creates a visual on the training loss and accuracy over epochs
