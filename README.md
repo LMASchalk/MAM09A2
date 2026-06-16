@@ -177,11 +177,14 @@ Per-class recall:
 
 The learning loss and accuracy curves on the validation set can be found in reports/
 
-## Discussion and future implementations
+## Discussion 
+
+### Future implementations
 1. Proper hyperparameter tuning for CNN 
 2. Training on the higher dimension images
     - Requires changes to the architecture and possibly the regularisation
 3. Creation of synthetic data to create more equal class distribution
+
 
 ## How to run
 These instructions apply specifically to the UvA Snellius server
