@@ -1,15 +1,15 @@
 # MAM09A2 - OctMNIST classification experiment. **Conventional machine learning vs a deep learning approach**
 ## Table of Contents
-- [About the methods](#about-the-methods)
-  - [Conventional machine learning](#conventional-machine-learning)
-  - [Deep learning](#deep-learning)
-    - [MultiLayer Perceptron](#multilayer-perceptron)
-    - [Convolutional Neural Network](#convolutional-neural-network)
 - [About the dataset](#about-the-dataset)
     - [The different classifications](#the-different-classifications)
         - [choroidal neovascularization (CNV)](#choroidal-neovascularization-cnv)
         - [diabetic macular edema (DME)](#diabetic-macular-edema-dme)
         - [drusen](#drusen)
+- [About the methods](#about-the-methods)
+  - [Conventional machine learning](#conventional-machine-learning)
+  - [Deep learning](#deep-learning)
+    - [MultiLayer Perceptron](#multilayer-perceptron)
+    - [Convolutional Neural Network](#convolutional-neural-network)
 - [About the data splits and preprocessing](#about-the-data-splits-and-preprocessing)
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
   - [Results](#results)
@@ -18,6 +18,56 @@
   - [Downloading the dataset](#downloading-the-dataset)
   - [Training for machine learning](#training-for-machine-learning)
   - [Training for Deep learning](#training-for-deep-learning)
+
+## About the dataset
+The dataset consists of 109,309 images of retinal Optical Coherence Tomography (OCT) from the OctMNIST dataset. These are 2D grayscale images and are available in multiple resolutions, however in this project 28x28 will be used. The dataset consists of a Training,Validation,Test split of (97,477 / 10,832 / 1,000). To see the original paper on this dataset see: Kermany D, Goldbaum M, Cai W et al. Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning. Cell. 2018; 172(5):1122-1131. doi:10.1016/j.cell.2018.02.010. https://www.cell.com/cms/10.1016/j.cell.2018.02.010/asset/17bdc187-16b7-4a49-acea-f982b88d3b89/main.assets/gr2_lrg.jpg
+### The different classifications
+The dataset contains four classifications: choroidal neovascularization (CNV), diabetic macular edema (DME), drusen and normal. An example from the dataset of each class can be seen below. An explanation and a showcase presentation on OCT of each condition can also be seen below. 
+
+<img src="reports\figures\DifferentClassesShowcase.png" alt="DifferentClassesShowcase.png">
+
+####  choroidal neovascularization (CNV)
+This condition occurs when new abnormal vessels grow from the choroid into the retinal pigment epithelium (RPE), see the figure below. On OCT this shows as a localized elevation of the RPE by an hyperreflective mass.
+
+<p float="left">
+  <img src="reports/figures/neovascularization_hero-2940749225.jpg"
+       alt="Choroidal neovascularization photo" width="45%" />
+  <img src="reports/figures/choroidalNeovascularization.png"
+       alt="Choroidal neovascularization on OCT" width="45%" />
+</p>
+
+*source:  https://www.allaboutvision.com/conditions/choroidal-neovascularization-cnv/* 
+
+#### diabetic macular edema (DME)
+This condition occurs due to leakage from existing retinal capillaries in the macula due to diabetes, see figure below. The leakage causes fluid to build up between the retinal layers, which can be seen on OCT as a spongy structure. 
+
+<p float="left">
+  <img src="reports\figures\Diabetic_Macular_Edema.jpg"
+       alt="Choroidal neovascularization photo" width="45%" />
+  <img src="reports\figures\diabeticMacularEdema.png"
+       alt="Choroidal neovascularization on OCT" width="45%" />
+</p>
+
+*source: https://eyewiki.org/Diabetic_Macular_Edema/*
+
+#### drusen
+Drusen are extracellular deposits of lipids, proteins and other debris and often presents between bruch's membreme and the RPE, see the figure below. Drusen are a marker and mediator of age-related macular degeneration, since they can cause dysregulation of the RPE. On OCT drusen present as small bumps along the RPE. 
+
+<p float="left">
+  <img src="reports\figures\drusen.jpg"
+       alt="drusen photo" width="45%" />
+  <img src="reports\figures\drusenOCT.png"
+       alt="drusen on OCT" width="45%" />
+</p>
+
+*source: https://www.scienceofamd.org/learn/*
+
+## About the data splits and preprocessing
+We use the official MedMNIST train/validation/test splits rather than resampling our own. This preserves comparability with published OCTMNIST benchmarks and, because MedMNIST exposes no patient identifiers, avoids the patient-level leakage that a random image-level re-split would risk (multiple scans from one patient landing in different splits).
+
+The training and validation sets are class-imbalanced (47.2% normal, 34.4% CNV, 10.5% DME, and 8.0% drusen) while the test set is balanced at 250 images per class (25% each). We address the training imbalance through class weighting in the models rather than altering the splits, and we report per-class metrics because the train/test distribution mismatch means overall accuracy alone can hide poor performance on the minority classes.**!!!**
+
+MedMNIST provides the images already centre-cropped and resized to a fixed square resolution (we use 28×28) with intensities as 8-bit grayscale; "preprocessed" here refers to that standardisation from the original heterogeneous OCT scans. Our pipeline adds only the model-specific steps applied per split: flattening and feature scaling for the classical baseline, and tensor conversion with normalisation to [0, 1] for the network.**!!!**
 
 ## About the methods
 *This section gives a short explanation and reasoning for the selected methods for both the machine learning and deep learning approaches. The goal is to be able to evaluate the effectiveness of the deep learning approach by comparing it to the conventional machine learning method.*
@@ -70,56 +120,7 @@ The feature extraction blocks finds features within the image, in this case set 
 </p>
 
 
-## About the dataset
-The dataset consists of 109,309 images of retinal Optical Coherence Tomography (OCT) from the OctMNIST dataset. These are 2D grayscale images and are available in multiple resolutions, however in this project 28x28 will be used. The dataset consists of a Training,Validation,Test split of (97,477 / 10,832 / 1,000). To see the original paper on this dataset see: Kermany D, Goldbaum M, Cai W et al. Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning. Cell. 2018; 172(5):1122-1131. doi:10.1016/j.cell.2018.02.010. https://www.cell.com/cms/10.1016/j.cell.2018.02.010/asset/17bdc187-16b7-4a49-acea-f982b88d3b89/main.assets/gr2_lrg.jpg
-### The different classifications
-The dataset contains four classifications: choroidal neovascularization (CNV), diabetic macular edema (DME), drusen and normal. An example from the dataset of each class can be seen below. An explanation and a showcase presentation on OCT of each condition can also be seen below. 
 
-<img src="reports\figures\DifferentClassesShowcase.png" alt="DifferentClassesShowcase.png">
-
-####  choroidal neovascularization (CNV)
-This condition occurs when new abnormal vessels grow from the choroid into the retinal pigment epithelium (RPE), see the figure below. On OCT this shows as a localized elevation of the RPE by an hyperreflective mass.
-
-<p float="left">
-  <img src="reports/figures/neovascularization_hero-2940749225.jpg"
-       alt="Choroidal neovascularization photo" width="45%" />
-  <img src="reports/figures/choroidalNeovascularization.png"
-       alt="Choroidal neovascularization on OCT" width="45%" />
-</p>
-
-*source:  https://www.allaboutvision.com/conditions/choroidal-neovascularization-cnv/* 
-
-#### diabetic macular edema (DME)
-This condition occurs due to leakage from existing retinal capillaries in the macula due to diabetes, see figure below. The leakage causes fluid to build up between the retinal layers, which can be seen on OCT as a spongy structure. 
-
-<p float="left">
-  <img src="reports\figures\Diabetic_Macular_Edema.jpg"
-       alt="Choroidal neovascularization photo" width="45%" />
-  <img src="reports\figures\diabeticMacularEdema.png"
-       alt="Choroidal neovascularization on OCT" width="45%" />
-</p>
-
-*source: https://eyewiki.org/Diabetic_Macular_Edema/*
-
-#### drusen
-Drusen are extracellular deposits of lipids, proteins and other debris and often presents between bruch's membreme and the RPE, see the figure below. Drusen are a marker and mediator of age-related macular degeneration, since they can cause dysregulation of the RPE. On OCT drusen present as small bumps along the RPE. 
-
-<p float="left">
-  <img src="reports\figures\drusen.jpg"
-       alt="drusen photo" width="45%" />
-  <img src="reports\figures\drusenOCT.png"
-       alt="drusen on OCT" width="45%" />
-</p>
-
-*source: https://www.scienceofamd.org/learn/*
-
-
-## About the data splits and preprocessing
-We use the official MedMNIST train/validation/test splits rather than resampling our own. This preserves comparability with published OCTMNIST benchmarks and, because MedMNIST exposes no patient identifiers, avoids the patient-level leakage that a random image-level re-split would risk (multiple scans from one patient landing in different splits).
-
-The training and validation sets are class-imbalanced (47.2% normal, 34.4% CNV, 10.5% DME, and 8.0% drusen) while the test set is balanced at 250 images per class (25% each). We address the training imbalance through class weighting in the models rather than altering the splits, and we report per-class metrics because the train/test distribution mismatch means overall accuracy alone can hide poor performance on the minority classes.**!!!**
-
-MedMNIST provides the images already centre-cropped and resized to a fixed square resolution (we use 28×28) with intensities as 8-bit grayscale; "preprocessed" here refers to that standardisation from the original heterogeneous OCT scans. Our pipeline adds only the model-specific steps applied per split: flattening and feature scaling for the classical baseline, and tensor conversion with normalisation to [0, 1] for the network.**!!!**
 
 
 ## Final Evaluation on the Test Set
