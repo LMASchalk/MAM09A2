@@ -22,7 +22,9 @@ A MultiLayer Perceptron (MLP) is the simplest for of a neural net. Ours consist 
 #### Convolutional Neural Network
 For the deep learning approach a Convolutional Neural Net (CNN) was used. It consists of a simple architecture of two feature extraction blocks (nn.Conv2d + nn.ReLU + nn.MaxPool2d) and a classifier block (nn.Flatten + nn.Linear + nn.ReLU + nn.Linear). See below for an overview of the architecture. 
 
-The feature extraction blocks finds features within the image, in this case set to 32 at the first block and 64 at the second. These are patterns in the images that are learnt, for instance lines, shapes etc. For a single image you can extract these features and see them in a feature map, see image below. 
+<img src="reports\figures\CNN architecture.png">
+
+The feature extraction blocks finds features within the image, in this case set to 32 at the first block and 64 at the second. These are patterns in the images that are learnt, for instance lines, shapes etc. For a single image you can extract these features and see them in a feature map, see image below. This is what makes CCNs particularly good at tasks with images, since any shifts or rotations of the shapes will not affect the performance. For instance, a shift or rotation will drasticly impact the performance of a MLP since it has never seen such a combination of pixels. However, a CNN still recognizes the shapes and structures in the images since its learnt the kernels that are able to find these patterns in the images. 
 
 
 ## About the dataset
