@@ -13,7 +13,7 @@
 - [About the data splits and preprocessing](#about-the-data-splits-and-preprocessing)
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
   - [Results](#results)
-- [Discussion and future implementations](#Discussion-and-future-implementations)
+- [Discussion](#Discussion)
 - [How to run](#how-to-run)
   - [Environment setup](#environment-setup)
   - [Downloading the dataset](#downloading-the-dataset)
