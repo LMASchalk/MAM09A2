@@ -175,8 +175,7 @@ Per-class recall:
 | drusen | 0.0000 | 0.2120 |
 | normal | 0.7720 | 0.9160 |
 
-Confusion matrices for both models are saved under `reports/figures/`
-
+The learning loss and accuracy curves on the validation set can be found in reports/
 
 ## Discussion and future implementations
 1. Proper hyperparameter tuning for CNN with k-fold cross validation
