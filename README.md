@@ -1,8 +1,10 @@
 # MAM09A2 - OctMNIST classification experiment. **Conventional machine learning vs a deep learning approach**
-- [About the methods](##About-the-methods)
-- [How to run](##How-to-run)
-- 
-
+- [About the methods](#about-the-methods)
+- [About the dataset](#about-the-dataset)
+- [About the data splits and preprocessing](#about-the-data-splits-and-preprocessing)
+- [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
+- [The different classifications](#the-different-classifications)
+- [How to run](#how-to-run)
 
 ## About the methods
 *This section gives a short explanation and reasoning for the selected methods for both the machine learning and deep learning approaches. The goal is to be able to evaluate the effectiveness of the deep learning approach by comparing it to the conventional machine learning method.*
