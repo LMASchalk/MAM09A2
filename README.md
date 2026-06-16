@@ -187,7 +187,7 @@ Per-class recall:
 ## How to run
 These instructions apply specifically to the UvA Snellius server
 ### Environment setup. 
-1. Pull the following repository: https://github.com/uvadlc/uvadlc_practicals_20252
+1. Pull the following repository: https://github.com/uvadlc/uvadlc_practicals_2025
 2. Then run sbatch src/bashrunscripts/install_environment.job
 
 ### Downloading the dataset
