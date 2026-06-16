@@ -176,9 +176,12 @@ Per-class recall:
 | drusen | 0.0000 | 0.2120 |
 | normal | 0.7720 | 0.9160 |
 
-The learning loss and accuracy curves on the validation set can be found in reports/
+The learning loss and accuracy curves on the validation set can be found in reports/..._learning_curves.png
 
 ## Discussion 
+It is clear that the best performing model all round is the CNN. 
+
+Interesting to note is the performance on drusen, it seems to be low on all models. We expect this to be due to the amount of available training images on this class and the difficulty of the task. Since drusen is not necessarily a pathology on its own and mainly a hallmark of age related macular degeneration it is possible to occur simultaneously with other conditions. This overlap makes the classification task alot harder, additionally the structure of how a drusen presents could bring difficulties. All the other pathologies have clear large hallmarks, but drusen appear as small dots on the scan and can be easily confused for other normal structures in a OCT scan or as part of structures within other pathologies. For instance, the spongey texture of DME also contain circulair structures which are not drusen. This makes the task increasingly difficult. Another point of this structure is the size of the drusen, given the training is performed on the low resolution images 28x28 and for the convolution later 14x14 and 7x7 in the later layers, the entire structure might be averaged out and disapear. 
 
 ### Future implementations
 1. Proper hyperparameter tuning for CNN 
