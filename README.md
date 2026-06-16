@@ -1,10 +1,23 @@
 # MAM09A2 - OctMNIST classification experiment. **Conventional machine learning vs a deep learning approach**
+## Table of Contents
 - [About the methods](#about-the-methods)
+  - [Conventional machine learning](#conventional-machine-learning)
+  - [Deep learning](#deep-learning)
+    - [MultiLayer Perceptron](#multilayer-perceptron)
+    - [Convolutional Neural Network](#convolutional-neural-network)
 - [About the dataset](#about-the-dataset)
 - [About the data splits and preprocessing](#about-the-data-splits-and-preprocessing)
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
-- [The different classifications](#the-different-classifications)
+  - [Results](#results)
+  - [The different classifications](#the-different-classifications)
+    - [choroidal neovascularization (CNV)](#choroidal-neovascularization-cnv)
+    - [diabetic macular edema (DME)](#diabetic-macular-edema-dme)
+    - [drusen](#drusen)
 - [How to run](#how-to-run)
+  - [Environment setup](#environment-setup)
+  - [Downloading the dataset](#downloading-the-dataset)
+  - [Training for machine learning](#training-for-machine-learning)
+  - [Training for Deep learning](#training-for-deep-learning)
 
 ## About the methods
 *This section gives a short explanation and reasoning for the selected methods for both the machine learning and deep learning approaches. The goal is to be able to evaluate the effectiveness of the deep learning approach by comparing it to the conventional machine learning method.*
