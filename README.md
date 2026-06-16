@@ -14,6 +14,7 @@
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
   - [Results](#results)
 - [Discussion](#Discussion)
+    - [Future implementations](#Future-implementations)
 - [How to run](#how-to-run)
   - [Environment setup](#environment-setup)
   - [Downloading the dataset](#downloading-the-dataset)
