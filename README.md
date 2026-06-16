@@ -13,11 +13,13 @@
 - [About the data splits and preprocessing](#about-the-data-splits-and-preprocessing)
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
   - [Results](#results)
+- [Discussion and future implementations](#Discussion-and-future-implementations)
 - [How to run](#how-to-run)
   - [Environment setup](#environment-setup)
   - [Downloading the dataset](#downloading-the-dataset)
   - [Training for machine learning](#training-for-machine-learning)
   - [Training for Deep learning](#training-for-deep-learning)
+
 
 ## About the dataset
 The dataset consists of 109,309 images of retinal Optical Coherence Tomography (OCT) from the OctMNIST dataset. These are 2D grayscale images and are available in multiple resolutions, however in this project 28x28 will be used. The dataset consists of a Training,Validation,Test split of (97,477 / 10,832 / 1,000). To see the original paper on this dataset see: Kermany D, Goldbaum M, Cai W et al. Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning. Cell. 2018; 172(5):1122-1131. doi:10.1016/j.cell.2018.02.010. https://www.cell.com/cms/10.1016/j.cell.2018.02.010/asset/17bdc187-16b7-4a49-acea-f982b88d3b89/main.assets/gr2_lrg.jpg
@@ -175,6 +177,12 @@ Per-class recall:
 
 ~~Confusion matrices for both models are saved under `reports/figures/`.~~
 
+
+## Discussion and future implementations
+1. Proper hyperparameter tuning for CNN with k-folds cross validation
+2. Training on the higher dimension images
+    a. Requires changes to the architecture and possibly the reguralisation     
+3. Creation of synthetic data to create more equal class distribution
 
 ## How to run
 These instructions apply specifically to the UvA Snellius server
