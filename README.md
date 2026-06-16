@@ -26,6 +26,14 @@ For the deep learning approach a Convolutional Neural Net (CNN) was used. It con
 
 The feature extraction blocks finds features within the image, in this case set to 32 at the first block and 64 at the second. These are patterns in the images that are learnt, for instance lines, shapes etc. For a single image you can extract these features and see them in a feature map, see image below. This is what makes CCNs particularly good at tasks with images, since any shifts or rotations of the shapes will not affect the performance. For instance, a shift or rotation will drasticly impact the performance of a MLP since it has never seen such a combination of pixels. However, a CNN still recognizes the shapes and structures in the images since its learnt the kernels that are able to find these patterns in the images. 
 
+<p float="left">
+  <img src="reports\figures\conv1_class0.png"
+       alt="Choroidal neovascularization photo" width="45%" />
+  <img src="reports\figures\conv2_class0.png"
+       alt="Choroidal neovascularization on OCT" width="45%" />
+</p>
+
+
 
 ## About the dataset
 The dataset consists of 109,309 images of retinal Optical Coherence Tomography (OCT) from the OctMNIST dataset. These are 2D grayscale images and are available in multiple resolutions, however in this project 28x28 will be used. The dataset consists of a Training,Validation,Test split of (97,477 / 10,832 / 1,000). To see the original paper on this dataset see: Kermany D, Goldbaum M, Cai W et al. Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning. Cell. 2018; 172(5):1122-1131. doi:10.1016/j.cell.2018.02.010. https://www.cell.com/cms/10.1016/j.cell.2018.02.010/asset/17bdc187-16b7-4a49-acea-f982b88d3b89/main.assets/gr2_lrg.jpg
