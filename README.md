@@ -179,9 +179,9 @@ Per-class recall:
 
 
 ## Discussion and future implementations
-1. Proper hyperparameter tuning for CNN with k-folds cross validation
+1. Proper hyperparameter tuning for CNN with k-fold cross validation
 2. Training on the higher dimension images
-    a. Requires changes to the architecture and possibly the reguralisation     
+    - Requires changes to the architecture and possibly the regularisation
 3. Creation of synthetic data to create more equal class distribution
 
 ## How to run
