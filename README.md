@@ -164,7 +164,7 @@ training data.
 | AUC (micro, OvR) | 0.6393 | 0.9229 |
 | Macro-F1 | 0.2588 | 0.6434 |
 
-**The state of the art model for this classification task is currently ResNet-50 and has an ACC of 0.762. Our initial simple CNN already reaches 90.0% of the performance compared to the state of the art**
+**The state of the art model for this classification task is currently ResNet-50 (28x28) and has an ACC of 0.762. Our initial simple CNN already reaches 90.0% of the performance compared to the state of the art**
 
 Per-class recall:
 
