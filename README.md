@@ -84,7 +84,7 @@ Before classification the pixel values are rescaled with a `MinMaxScaler`, which
 
 The LinearSVC then learns a linear decision boundary for each of the four classes in a one-vs-rest fashion, separating each class from the rest with the largest possible margin. A few settings were changed from their defaults. The parameter `class_weight` is set to `"balanced"` rather than the default, which treats every class equally. This scales each class's penalty inversely to how often it appears, so mistakes on the rare classes such as drusen count for more and the model is not pulled towards the common classes. The parameter `dual` is set to `False` instead of letting it be chosen automatically, which solves the primal form of the optimisation rather than the dual. According to scikit-learn's documentation, this is the recommended and faster option when there are many more samples than features, as is the case here with far more images than the 784 pixel features. The parameter `random_state` is fixed to a set value (42) rather than left unseeded, so the solver's internal randomness is deterministic and the same model is produced on every run. Finally, `max_iter` is raised to 3000 from its default of 1000. This represents the cap on the number of solver iterations before it stops, and the higher cap gives the solver enough room to converge on this data, avoiding the convergence warning that the default can produce on the larger train+val refit.
 
-The regularisation strength `C`, which controls the trade-off between a wide margin and misclassifying training points, is the only ""hyperparameter"" that is tuned. Four candidate values spanning several orders of magnitude (0.001, 0.01, 0.1, 1.0) are each fitted on the training split and scored on the official validation split, and the value giving the best accuracy is kept, rather than tuning with k-fold cross-validation, since the dataset already provides a dedicated validation set. The model with the best `C` is then refitted on the combined training and validation data, and the held-out test set is scored exactly once using the same shared metrics module as the CNN (accuracy, macro one-vs-rest AUC, macro-F1 and per-class recall), so the two models are directly comparable.
+The regularisation strength `C`, which controls the trade-off between a wide margin and misclassifying training points, is the only hyperparameter that is tuned. Four candidate values spanning several orders of magnitude (0.001, 0.01, 0.1, 1.0) are each fitted on the training split and scored on the official validation split, and the value giving the best accuracy is kept, rather than tuning with k-fold cross-validation, since the dataset already provides a dedicated validation set. The model with the best `C` is then refitted on the combined training and validation data, and the held-out test set is scored exactly once using the same shared metrics module as the CNN (accuracy, macro one-vs-rest AUC, macro-F1 and per-class recall), so the two models are directly comparable.
 
 ### Deep learning
 For the classification task two different Deep Learning archetypes were used, MultiLayer Perceptron and Convolutional Neural Network. The specifics of how the two archetypes are implemented will be discussed in the next sections. The optimizer, loss function and regularization are the same for both experiments. **Optimizer: Adam** (Often used since it is computationally efficient and able to deal with pathological curvatures in the gradient. However, Adam does often tend to find minima that are more extreme and other optimizers such as stochastic gradient descent with momentum often find more flatter minima which is leads to better generalisation), **Loss function: CrossEntropy** (Good for classification due to the shape of the loss function exploding at 0) and **Regularization: Early stopping and L2**. 
@@ -211,16 +211,86 @@ Interesting to note is the performance on drusen, it seems to be low on all mode
 
 
 ## How to run
-These instructions apply specifically to the UvA Snellius server
-### Environment setup. 
-1. Pull this repository from Github (https://github.com/LMASchalk/MAM09A2.git) into your home directory.
-2. Run `bash ~/MAM09A2/src/bashrunscripts/setup_env.sh`
 
-### Downloading the dataset
-Run `bash ~/MAM09A2/src/bashrunscripts/make_dataset.sh`
+The project can be run on the UvA Snellius cluster (GPU) or on a local
+machine (CPU). Follow the section matching your setup.
 
-### Training for machine learning
-Run `sbatch ~/MAM09A2/src/bashrunscripts/fit_linearSVC.job`
+In both cases, **run every command from the repository root** so that the
+relative paths inside the scripts resolve correctly.
 
-### Training for Deep learning 
-Run `sbatch ~/MAM09A2/src/bashrunscripts/fit_deeplearning.job`
+### A. Snellius cluster
+
+Two of the steps below need internet access and must be run **directly on a
+login node** (the shell you get right after `ssh`), not submitted with
+`sbatch`. Compute nodes have no internet, so submitting these would fail.
+The two training steps are the opposite: they are submitted with `sbatch`
+to run on compute nodes.
+
+#### 1. Get the repository
+SSH into Snellius, then clone this repository into your home directory:
+```
+git clone https://github.com/LMASchalk/MAM09A2.git ~/MAM09A2
+```
+
+#### 2. Environment setup (login node)
+```
+bash src/bashrunscripts/setup_env.sh
+```
+This creates the `dl_gpu` conda environment from `dl_gpu.yml`. A harmless SURF
+warning about conda may appear. This step takes a while.
+
+#### 3. Download the dataset (login node)
+```
+bash src/bashrunscripts/make_dataset.sh
+```
+Run this once. The dataset is then cached locally and read offline by the
+training jobs.
+
+#### 4. Train the machine learning baseline (compute node)
+```
+sbatch src/bashrunscripts/fit_linearSVC.job
+```
+
+#### 5. Train the deep learning model (compute node)
+```
+sbatch src/bashrunscripts/fit_deeplearning.job
+```
+
+### B. Local machine (no cluster)
+
+**Prerequisite:** a working conda installation (Miniconda or Anaconda) that
+is initialized in your shell. If `conda` is not found, install Miniconda
+first (https://www.anaconda.com/docs/getting-started/miniconda/install/overview), open a new terminal, and continue. The setup script checks for this and will tell you
+if conda is missing. `conda` has to be placed in your PATH.
+
+The login-node / compute-node distinction does not apply locally: your
+machine has internet throughout, so every step is a normal `bash` run.
+
+#### 1. Get the repository
+```
+git clone https://github.com/LMASchalk/MAM09A2.git
+cd MAM09A2
+```
+
+#### 2. Environment setup
+```
+bash src/bashrunscripts/setup_env.sh
+```
+This creates the `dl_cpu` conda environment from `dl_cpu.yml`.
+
+#### 3. Download the dataset
+```
+bash src/bashrunscripts/make_dataset.sh
+```
+
+#### 4. Train the machine learning baseline
+```
+bash src/bashrunscripts/fit_linearsvc.sh
+```
+
+#### 5. Train the deep learning model
+```
+bash src/bashrunscripts/fit_deeplearning.sh
+```
+This runs on CPU. At 28x28 it is slow but adequate for verifying the
+pipeline end to end before moving to the cluster for a full run.

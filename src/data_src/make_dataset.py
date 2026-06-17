@@ -15,7 +15,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-    data_folder = Path.home() / "MAM09A2" / "data" / "raw"
+    data_folder = Path(__file__).resolve().parents[2] / "data" / "raw"
+    data_folder.mkdir(parents=True, exist_ok=True)
 
     # Use the CLI parameter here:
     OCTMNIST(
