@@ -128,9 +128,10 @@ We decided to tune on two hyperparameters (Learning Rate and L2 Lambda). We did 
 
 | Hyperparameter | MLP | CNN |
 |---|---|---|
-| Learning Rate | 1e-3 | 1e-4 |
-| L2 lambda | 1e-4 | 1e-3 |
-| Batch size | 64 | 64 |
+| Learning Rate | 1e-4 | 1e-4 |
+| L2 lambda | 1e-5 | 1e-3 |
+
+Other hyperparameters were kept the same and were not tuned: 
 
 ## Final Evaluation on the Test Set
 
