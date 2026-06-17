@@ -79,11 +79,11 @@ MedMNIST provides the images already centre-cropped and resized to a fixed squar
 
 For the conventional machine learning approach a Linear Support Vector Classifier (LinearSVC) was used. Each 28x28 grayscale image is flattened into a single vector of 784 pixel values, which forms the input to the model.
 
-Before classification the pixel values are rescaled with a `MinMaxScaler`, which linearly maps each feature to the range [0, 1] using the minimum and maximum seen in the training data. Scaling matters because a support vector machine positions its decision boundary using distances between points, so the default of feeding raw pixels straight in would let the features with the largest values dominate the margin and distort the fit. MinMaxScaler was chosen over the common alternative (StandardScaler) because pixel intensities are already bounded and non-negative (0-255): mapping them to [0, 1] preserves that structure and keeps zero pixels at zero, whereas standardising would introduce negative values and assume a roughly Gaussian spread that pixel data does not have. The scaler sits inside a pipeline together with the classifier, so it is fitted on the training data only and the same transformation is reused on the validation and test data.
+Before classification the pixel values are rescaled with a `MinMaxScaler`, which linearly maps each feature to the range [0, 1] using the minimum and maximum seen in the training data. Scaling matters because a support vector machine positions its decision boundary using distances between points, so the default of feeding raw pixels straight in would let the features with the largest values dominate the margin and distort the fit. `MinMaxScaler` was chosen over the common alternative (`StandardScaler`) because pixel intensities are already bounded and non-negative (0-255): mapping them to [0, 1] preserves that structure and keeps zero pixels at zero, whereas standardising would introduce negative values and assume a roughly Gaussian spread that pixel data does not have. The scaler sits inside a pipeline together with the classifier, so it is fitted on the training data only and the same transformation is reused on the validation and test data.
 
-The LinearSVC then learns a linear decision boundary for each of the four classes in a one-vs-rest fashion, separating each class from the rest with the largest possible margin. A few settings were changed from their defaults. The parameter `class_weight` is set to `"balanced"` rather than the default, which treats every class equally. This scales each class's penalty inversely to how often it appears, so mistakes on the rare classes such as drusen count for more and the model is not pulled towards the common classes. The parameter `dual` is set to `False` instead of letting it be chosen automatically, which solves the primal form of the optimisation rather than the dual. This is the recommended and faster option when there are many more samples than features, as is the case here with far more images than the 784 pixel features. The parameter `random_state` is fixed to a set value (42) rather than left unseeded, so the solver's internal randomness is deterministic and the same model is produced on every run. Finally, `max_iter` is raised to 5000 from its default of 1000. This represents the cap on the number of solver iterations before it stops, and the higher cap gives the solver enough room to converge on this data, avoiding the convergence warning that the default can produce on the larger train+val refit.
+The LinearSVC then learns a linear decision boundary for each of the four classes in a one-vs-rest fashion, separating each class from the rest with the largest possible margin. A few settings were changed from their defaults. The parameter `class_weight` is set to `"balanced"` rather than the default, which treats every class equally. This scales each class's penalty inversely to how often it appears, so mistakes on the rare classes such as drusen count for more and the model is not pulled towards the common classes. The parameter `dual` is set to `False` instead of letting it be chosen automatically, which solves the primal form of the optimisation rather than the dual. According to scikit-learn's documentation, this is the recommended and faster option when there are many more samples than features, as is the case here with far more images than the 784 pixel features. The parameter `random_state` is fixed to a set value (42) rather than left unseeded, so the solver's internal randomness is deterministic and the same model is produced on every run. Finally, `max_iter` is raised to 3000 from its default of 1000. This represents the cap on the number of solver iterations before it stops, and the higher cap gives the solver enough room to converge on this data, avoiding the convergence warning that the default can produce on the larger train+val refit.
 
-The regularisation strength `C`, which controls the trade-off between a wide margin and misclassifying training points, is the only hyperparameter that is tuned. Five candidate values spanning several orders of magnitude (0.001, 0.01, 0.1, 1.0 and 10.0) are each fitted on the training split and scored on the official validation split, and the value giving the best balanced accuracy is kept~~, rather than tuning with k-fold cross-validation, since the dataset already provides a dedicated validation set~~. The model with the best C is then refitted on the combined training and validation data, and the held-out test set is scored exactly once using the same shared metrics module as the CNN (accuracy, macro one-vs-rest AUC, macro-F1 and per-class recall), so the two models are directly comparable.
+The regularisation strength `C`, which controls the trade-off between a wide margin and misclassifying training points, is the only ""hyperparameter"" that is tuned. Four candidate values spanning several orders of magnitude (0.001, 0.01, 0.1, 1.0) are each fitted on the training split and scored on the official validation split, and the value giving the best accuracy is kept, rather than tuning with k-fold cross-validation, since the dataset already provides a dedicated validation set. The model with the best `C` is then refitted on the combined training and validation data, and the held-out test set is scored exactly once using the same shared metrics module as the CNN (accuracy, macro one-vs-rest AUC, macro-F1 and per-class recall), so the two models are directly comparable.
 
 ### Deep learning
 For the classification task two different Deep Learning archetypes were used, MultiLayer Perceptron and Convolutional Neural Network. The specifics of how the two archetypes are implemented will be discussed in the next sections. The optimizer, loss function and regularization are the same for both experiments. **Optimizer: Adam** (Often used since it is computationally efficient and able to deal with pathological curvatures in the gradient. However, Adam does often tend to find minima that are more extreme and other optimizers such as stochastic gradient descent with momentum often find more flatter minima which is leads to better generalisation), **Loss function: CrossEntropy** (Good for classification due to the shape of the loss function exploding at 0) and **Regularization: Early stopping and L2**. 
@@ -161,9 +161,9 @@ training data.
 
 | Metric | LinearSVC baseline | CNN |
 |---|---|---|
-| Accuracy (ACC) | 0.3760 | 0.6780 |
-| AUC (micro, OvR) | 0.6393 | 0.9229 |
-| Macro-F1 | 0.2588 | 0.6434 |
+| Accuracy (ACC) | 0.3510 | 0.6780 |
+| AUC (OvR) | 0.6271 | 0.9229 |
+| Macro-F1 | 0.2560 | 0.6434 |
 
 **The state of the art model for this classification task is currently ResNet-50 (28x28) and has an ACC of 0.762. Our initial simple CNN already reaches 90.0% of the performance compared to the state of the art**
 
@@ -171,23 +171,39 @@ Per-class recall:
 
 | Class | LinearSVC baseline | CNN |
 |---|---|---|
-| CNV | 0.7160 | 0.9640 |
-| DME | 0.0160 | 0.6200 |
-| drusen | 0.0000 | 0.2120 |
-| normal | 0.7720 | 0.9160 |
+| CNV | 0.7760 | 0.9640 |
+| DME | 0.0400 | 0.6200 |
+| drusen | 0.0160 | 0.2120 |
+| normal | 0.5720 | 0.9160 |
 
 The learning loss and accuracy curves on the validation set can be found in reports/..._learning_curves.png
 
 ## Discussion 
 It is clear that the best performing model all round is the CNN. 
 
+The reason the CNN outperforms the LinearSVC baseline so decisively is structural rather than a  matter of tuning. The baseline is a linear classifier on raw, flattened pixels, meaning it has no notion of spatial locality or translation invariance, so it can only separate classes that differ by large, position-stable intensity patterns. That is exactly why it performs better on CNV and normal (recall 0.78 and 0.57) but effectively ignores DME and drusen (recall 0.04 and 0.02): it has collapsed into a two-class detector. The CNN's convolutions, by contrast, learn local texture features that are reused across the image, which is precisely what the harder classes require: moving from the baseline to the CNN lifts DME recall from 0.04 to 0.62 and drusen from 0.02 to 0.21. This also answers *under what conditions the neural network helps*: it helps most where the discriminative signal is local texture rather than global intensity.
+
 Interesting to note is the performance on drusen, it seems to be low on all models. We expect this to be due to the amount of available training images on this class and the difficulty of the task. Since drusen is not necessarily a pathology on its own and mainly a hallmark of age related macular degeneration it is possible to occur simultaneously with other conditions. This overlap makes the classification task alot harder, additionally the structure of how a drusen presents could bring difficulties. All the other pathologies have clear large hallmarks, but drusen appear as small dots on the scan and can be easily confused for other normal structures in a OCT scan or as part of structures within other pathologies. For instance, the spongey texture of DME also contain circulair structures which are not drusen. This makes the task increasingly difficult. Another point of this structure is the size of the drusen, given the training is performed on the low resolution images 28x28 and for the convolution later 14x14 and 7x7 in the later layers, the entire structure might be averaged out and disappear. 
 
+### Limitations
+
+- **Preprocessing is not symmetric across the two models.** The LinearSVC pipeline scales its inputs to [0, 1] via `MinMaxScaler`, but the deep-learning dataset feeds raw 0–255 pixel values to the network. The *evaluation* protocol is shared, but the input preprocessing is not, which is a caveat on the strict "like-for-like" comparison.
+- **The CNN has no normalisation or regularisation layers** (no BatchNorm, no Dropout) beyond weight decay, and uses a fixed learning rate with no scheduler.
+- **Early stopping monitors validation loss**, not the metric we actually report (AUC / accuracy); on imbalanced data these can diverge, so the checkpointed model is "best" by loss rather than by the reported metric.
+- ~~**Reproducibility is only partially pinned.** Global seeds are set, but the training `DataLoader` shuffles with multiple workers without a fixed generator, and cuDNN determinism is not enforced, so runs are not bit-reproducible.~~
+- **Results are from a single seed and a single test pass**, with no error bars.
+
+
 ### Future implementations
-1. Proper hyperparameter tuning for CNN 
-2. Training on the higher dimension images
-    - Requires changes to the architecture and possibly the regularisation
-3. Creation of synthetic data to create more equal class distribution
+
+- **Weight the CNN loss by class frequency** (or use a weighted sampler), mirroring the baseline's `class_weight="balanced"`, and report whether this moves drusen/DME recall - this would isolate the imbalance effect from the resolution effect.
+- **Normalise the network inputs** so preprocessing matches the baseline.
+- Build a **stronger, fairer baseline**: e.g., PCA-whitened features feeding a linear or RBF SVM.
+- **Repeat the CNN over several seeds** to obtain error bars on the reported metrics.
+- Proper **hyperparameter tuning for the CNN**.
+- **Training on the higher-dimension images** (requires changes to the architecture and possibly the regularisation), which directly addresses the resolution hypothesis for drusen.
+- **Creation of synthetic data** to create a more equal class distribution.
+- Add **BatchNorm, Dropout, and a learning-rate scheduler**, and switch early stopping to monitor the reported metric.
 
 
 ## How to run
