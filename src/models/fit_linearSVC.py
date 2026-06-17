@@ -16,17 +16,17 @@ from joblib import dump
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import LinearSVC
-from sklearn.metrics import balanced_accuracy_score
+from sklearn.metrics import accuracy_score
 
 import metrics
 
 # Configuration
 SIZE = 28
 MODELNAME = "linear_svc_octmnist"
-C_GRID = [0.001]  # [0.001, 0.01, 0.1, 1.0, 10.0]
-MAX_ITER = 1000
+C_GRID = [0.001, 0.01, 0.1, 1.0]
+MAX_ITER = 3000
 SEED = 42
-SELECTION_METRIC = "balanced_accuracy"
+SELECTION_METRIC = "accuracy"
 REFIT_ON_TRAINVAL = True
 DOWNLOAD_IF_MISSING = False
 
@@ -85,13 +85,13 @@ def choose_c(X_train, y_train, X_val, y_val):
     for c in C_GRID:
         model = build_model(c)
         model.fit(X_train, y_train)
-        val_bacc = balanced_accuracy_score(y_val, model.predict(X_val))
+        val_bacc = accuracy_score(y_val, model.predict(X_val))
         sweep.append((c, val_bacc))
-        print(f"  C={c:<8g} val balanced_acc={val_bacc:.4f}")
+        print(f"  C={c:<8g} val acc={val_bacc:.4f}")
         if val_bacc > best_score:
             best_score = val_bacc
             best_c = c
-    print(f"  -> selected C={best_c:g} on val balanced_acc={best_score:.4f}")
+    print(f"  -> selected C={best_c:g} on val acc={best_score:.4f}")
     return best_c, sweep
 
 
@@ -107,7 +107,7 @@ def write_report(path, best_c, sweep, test_metrics):
     lines.append(f"- Final model refit on: {refit_on}")
     lines.append("")
     lines.append("## Validation sweep (selecting C)")
-    lines.append("| C | val balanced_acc |")
+    lines.append("| C | val acc |")
     lines.append("|---|---|")
     for c, bacc in sweep:
         mark = " **(selected)**" if c == best_c else ""
