@@ -121,7 +121,8 @@ The feature extraction blocks finds features within the image, in this case set 
   <img src="reports\conv2_class3.png" width="38%" />
 </p>
 
-**Hyperparameters:**
+#### Hyperparameters
+
 We decided to tune on two hyperparameters (Learning Rate and L2 Lambda). We did this for three different values of both parameter leading to nine different combinations of these parameters. Then we picked the model that performed the best on the validation set based on the accuracy. This resulted in:
 
 | Hyperparameter | MLP | CNN |
