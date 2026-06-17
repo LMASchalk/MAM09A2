@@ -124,7 +124,7 @@ The feature extraction blocks finds features within the image, in this case set 
 
 #### Hyperparameters
 
-We decided to tune on two hyperparameters (Learning Rate and L2 Lambda). We did this for three different values of both parameter leading to nine different combinations of these parameters. Then we picked the model that performed the best on the validation set based on the accuracy. This resulted in:
+We decided to tune on two hyperparameters (Learning Rate and L2 Lambda). We did this for three different values (1e3/4/5) of both parameter leading to nine different combinations of these parameters. Then we picked the model that performed the best on the validation set based on the accuracy. This resulted in:
 
 | Hyperparameter | MLP | CNN |
 |---|---|---|
