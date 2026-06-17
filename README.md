@@ -99,25 +99,25 @@ For the deep learning approach a Convolutional Neural Net (CNN) was used. It con
 
 The feature extraction blocks finds features within the image, in this case set to 32 at the first block and 64 at the second. These are patterns in the images that are learnt, for instance lines, shapes etc. For a single image you can extract these features and see them in a feature map, see image below. This is what makes CCNs particularly good at tasks with images, since any shifts or rotations of the shapes will not affect the performance. For instance, a shift or rotation will drasticly impact the performance of a MLP since it has never seen such a combination of pixels. However, a CNN still recognizes the shapes and structures in the images since its learnt the kernels that are able to find these patterns in the images. 
 
-**Feature map of class: Normal**
+**Feature map of class: CNV**
 <p float="left">
   <img src="reports\conv1_class0.png" width="60%" />
   <img src="reports\conv2_class0.png" width="38%" />
 </p>
 
-**Feature map of class: CNV**
+**Feature map of class: DME**
 <p float="left">
   <img src="reports\conv1_class1.png" width="60%" />
   <img src="reports\conv2_class1.png" width="38%" />
 </p>
 
-**Feature map of class: DME**
+**Feature map of class: drusen**
 <p float="left">
   <img src="reports\conv1_class2.png" width="60%" />
   <img src="reports\conv2_class2.png" width="38%" />
 </p>
 
-**Feature map of class: drusen**
+**Feature map of class: Normal**
 <p float="left">
   <img src="reports\conv1_class3.png" width="60%" />
   <img src="reports\conv2_class3.png" width="38%" />
