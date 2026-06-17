@@ -124,8 +124,8 @@ The feature extraction blocks finds features within the image, in this case set 
 **Hyperparameters:**
 | Hyperparameter | MLP | CNN |
 |---|---|---|
-| Learning Rate | 1e-3 | 1e-3 |
-| L2 lambda | 1e-4 | 1e-4 |
+| Learning Rate | 1e-3 | 1e-4 |
+| L2 lambda | 1e-4 | 1e-3 |
 | Batch size | 64 | 64 |
 
 ## Final Evaluation on the Test Set
@@ -163,19 +163,19 @@ training data.
 
 | Metric | LinearSVC baseline (c = 1.0) | CNN |
 |---|---|---|
-| Accuracy (ACC) | 0.3510 | 0.6780 |
-| AUC (OvR) | 0.6271 | 0.9229 |
-| Macro-F1 | 0.2560 | 0.6434 |
+| Accuracy (ACC) | 0.3510 | 0.6830 |
+| AUC (OvR) | 0.6271 | 0.9258 |
+| Macro-F1 | 0.2560 | 0.6399 |
 
-**The state of the art model for this classification task is currently ResNet-50 (28x28) and has an ACC of 0.762. Our initial simple CNN already reaches 90.0% of the performance compared to the state of the art**
+**The state of the art model for this classification task is currently ResNet-50 (28x28) and has an ACC of 0.762. Our initial simple CNN already reaches 90.2% of the performance compared to the state of the art**
 
 Per-class recall:
 
 | Class | LinearSVC baseline (c = 1.0) | CNN |
 |---|---|---|
-| CNV | 0.7760 | 0.9640 |
-| DME | 0.0400 | 0.6200 |
-| drusen | 0.0160 | 0.2120 |
+| CNV | 0.7760 | 0.9400 |
+| DME | 0.0400 | 0.7000 |
+| drusen | 0.0160 | 0.1760 |
 | normal | 0.5720 | 0.9160 |
 
 The learning loss and accuracy curves on the validation set can be found in reports/..._learning_curves.png
