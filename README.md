@@ -123,9 +123,12 @@ The feature extraction blocks finds features within the image, in this case set 
   <img src="reports\conv2_class3.png" width="38%" />
 </p>
 
-
-
-
+**Hyperparameters:**
+| Hyperparameter | MLP | CNN |
+|---|---|---|
+| Learning Rate | 1e-3 | 1e-3 |
+| L2 lambda | 1e-4 | 1e-4 |
+| Batch size | 64 | 64 |
 
 ## Final Evaluation on the Test Set
 
