@@ -134,6 +134,7 @@ We decided to tune on two hyperparameters (Learning Rate and L2 Lambda). We did 
 Other hyperparameters were kept the same and were not tuned: 
 
 Batch size: 64
+
 Epochs: 30
 
 ## Final Evaluation on the Test Set
