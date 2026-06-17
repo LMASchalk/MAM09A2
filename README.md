@@ -17,10 +17,8 @@
     - [Limitations](#Limitations)
     - [Future implementations](#Future-implementations)
 - [How to run](#how-to-run)
-  - [Environment setup](#environment-setup)
-  - [Downloading the dataset](#downloading-the-dataset)
-  - [Training for machine learning](#training-for-machine-learning)
-  - [Training for Deep learning](#training-for-deep-learning)
+  - [A. Snellius cluster](#A.-Snellius-cluster)
+  - [B. Local machine (no cluster)](#B.-Local-machine-(no-cluster))
 
 
 ## About the dataset
