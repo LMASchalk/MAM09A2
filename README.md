@@ -166,22 +166,22 @@ training data.
 
 ### Results
 
-| Metric | LinearSVC baseline (c = 1.0) | CNN |
-|---|---|---|
-| Accuracy (ACC) | 0.3510 | 0.6830 |
-| AUC (OvR) | 0.6271 | 0.9258 |
-| Macro-F1 | 0.2560 | 0.6399 |
+| Metric | LinearSVC baseline (c = 1.0) | CNN |MLP|
+|---|---|---|---|
+| Accuracy (ACC) | 0.3510 | 0.6830 |0.5820|
+| AUC (OvR) | 0.6271 | 0.9258 |0.8629|
+| Macro-F1 | 0.2560 | 0.6399 |0.5147|
 
 **The state of the art model for this classification task is currently ResNet-50 (28x28) and has an ACC of 0.762. Our initial simple CNN already reaches 90.2% of the performance compared to the state of the art**
 
 Per-class recall:
 
-| Class | LinearSVC baseline (c = 1.0) | CNN |
-|---|---|---|
-| CNV | 0.7760 | 0.9400 |
-| DME | 0.0400 | 0.7000 |
-| drusen | 0.0160 | 0.1760 |
-| normal | 0.5720 | 0.9160 |
+| Class | LinearSVC baseline (c = 1.0) | CNN |MLP|
+|---|---|---|---|
+| CNV | 0.7760 | 0.9400 |0.8520|
+| DME | 0.0400 | 0.7000 |0.5720|
+| drusen | 0.0160 | 0.1760 |0.0400|
+| normal | 0.5720 | 0.9160 |0.8640|
 
 The learning loss and accuracy curves on the validation set can be found in reports/..._learning_curves.png
 
