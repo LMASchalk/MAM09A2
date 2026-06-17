@@ -14,6 +14,7 @@
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
   - [Results](#results)
 - [Discussion](#Discussion)
+    - [Limitations](#Limitations)
     - [Future implementations](#Future-implementations)
 - [How to run](#how-to-run)
   - [Environment setup](#environment-setup)
@@ -159,7 +160,7 @@ training data.
 
 ### Results
 
-| Metric | LinearSVC baseline | CNN |
+| Metric | LinearSVC baseline (c = 1.0) | CNN |
 |---|---|---|
 | Accuracy (ACC) | 0.3510 | 0.6780 |
 | AUC (OvR) | 0.6271 | 0.9229 |
@@ -169,7 +170,7 @@ training data.
 
 Per-class recall:
 
-| Class | LinearSVC baseline | CNN |
+| Class | LinearSVC baseline (c = 1.0) | CNN |
 |---|---|---|
 | CNV | 0.7760 | 0.9640 |
 | DME | 0.0400 | 0.6200 |
@@ -190,7 +191,7 @@ Interesting to note is the performance on drusen, it seems to be low on all mode
 - **Preprocessing is not symmetric across the two models.** The LinearSVC pipeline scales its inputs to [0, 1] via `MinMaxScaler`, but the deep-learning dataset feeds raw 0–255 pixel values to the network. The *evaluation* protocol is shared, but the input preprocessing is not, which is a caveat on the strict "like-for-like" comparison.
 - **The CNN has no normalisation or regularisation layers** (no BatchNorm, no Dropout) beyond weight decay, and uses a fixed learning rate with no scheduler.
 - **Early stopping monitors validation loss**, not the metric we actually report (AUC / accuracy); on imbalanced data these can diverge, so the checkpointed model is "best" by loss rather than by the reported metric.
-- ~~**Reproducibility is only partially pinned.** Global seeds are set, but the training `DataLoader` shuffles with multiple workers without a fixed generator, and cuDNN determinism is not enforced, so runs are not bit-reproducible.~~
+- **Reproducibility is only partially pinned.** Global seeds are set, but the training `DataLoader` shuffles with multiple workers without a fixed generator, and cuDNN determinism is not enforced, so runs are not bit-reproducible.
 - **Results are from a single seed and a single test pass**, with no error bars.
 
 
