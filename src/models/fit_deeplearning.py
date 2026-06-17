@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import argparse
 from pathlib import Path
 
-from utils import npz_filename, OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves,find_availableName,EarlyStopping
+from utils import npz_filename, OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,plot_learning_curves,find_availableName,EarlyStopping,run_tag
 
 import metrics
 
@@ -192,20 +192,29 @@ def main():
     print(metrics.format_metrics(test_metrics))
 
     # Save model file and ensure that it does not overwrite existing files.
-    fileName = find_availableName(MODELS_DIR,f"{name}_{modeltype}.pt")
-    savePATH = MODELS_DIR / fileName    
+    tag = run_tag(modeltype.lower(), size)
+    fileName = find_availableName(MODELS_DIR, f"{tag}.pt")
+    savePATH = MODELS_DIR / fileName
     torch.save(model, savePATH)
     print(f"Model saved to: {savePATH}")
 
+    stem = Path(fileName).stem
+
+    report_path = REPORTS_DIR / f"{stem}_metrics.md"
+    report_path.write_text(
+        f"# {modeltype} ({stem})\n\n"
+        "```\n" + metrics.format_metrics(test_metrics) + "\n```\n"
+    )
+    print(f"[done] report saved to {report_path}")
+
     # Creates a visual on the training loss and accuracy over epochs
-    p = Path(fileName)
     plot_learning_curves(
         train_losses=train_losses,
         val_losses=val_losses,
         train_accs=train_accs,
         val_accs=val_accs,
         best_epoch = early_stopping.best_epoch + 1,
-        saveName=p.stem,
+        saveName=stem,
         reports_dir=REPORTS_DIR
     )   
 

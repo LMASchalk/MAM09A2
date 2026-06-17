@@ -18,11 +18,12 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score
 
+from utils import npz_filename, find_availableName, run_tag
 import metrics
 
 # Configuration
 SIZE = 28
-MODELNAME = "linear_svc_octmnist"
+# MODELNAME = "linear_svc_octmnist"
 C_GRID = [0.001, 0.01, 0.1, 1.0]
 MAX_ITER = 3000
 SEED = 42
@@ -36,14 +37,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = REPO_ROOT / "data" / "raw"
 MODELS_DIR = REPO_ROOT / "models"
 REPORTS_DIR = REPO_ROOT / "reports"
-
-
-def npz_filename(size):
-    # 28px is octmnist.npz; other sizes are octmnist_<size>.npz.
-    if size == 28:
-        return "octmnist.npz"
-    return f"octmnist_{size}.npz"
-
+tag = run_tag("linearsvc", SIZE)
 
 def download_dataset(size):
     # medmnist is imported here so it is only needed when actually downloading.
@@ -166,12 +160,12 @@ def main():
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    model_path = MODELS_DIR / f"{MODELNAME}_{SIZE}.joblib"
+    model_name = find_availableName(MODELS_DIR, f"{tag}.joblib")
+    model_path = MODELS_DIR / model_name
     dump(final_model, model_path)
-    report = write_report(
-        REPORTS_DIR / f"baseline_linearsvc_{SIZE}.md",
-        best_c, sweep, test_metrics,
-    )
+
+    report_name = find_availableName(REPORTS_DIR, f"{tag}_metrics.md")
+    report = write_report(REPORTS_DIR / report_name, best_c, sweep, test_metrics)
 
     print()
     print(report)

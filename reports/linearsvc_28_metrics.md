@@ -10,17 +10,14 @@
 ## Validation sweep (selecting C)
 | C | val acc |
 |---|---|
-| 0.001 | 0.6488 |
-| 0.01 | 0.6627 |
-| 0.1 | 0.6662 |
-| 1 **(selected)** | 0.6671 |
+| 0.001 **(selected)** | 0.6488 |
 
 ## Test set (evaluated once)
-- Accuracy: 0.3520
-- AUC: 0.6272
-- Macro-F1: 0.2566
+- Accuracy: 0.3760
+- AUC: 0.6393
+- Macro-F1: 0.2588
 - Per-class recall:
-    - choroidal neovascularization (CNV): 0.7760
-    - diabetic macular edema (DME): 0.0400
-    - drusen: 0.0160
-    - normal: 0.5760
+    - choroidal neovascularization (CNV): 0.7160
+    - diabetic macular edema (DME): 0.0160
+    - drusen: 0.0000
+    - normal: 0.7720
