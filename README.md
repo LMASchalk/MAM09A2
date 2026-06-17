@@ -10,6 +10,7 @@
   - [Deep learning](#deep-learning)
     - [MultiLayer Perceptron](#multilayer-perceptron)
     - [Convolutional Neural Network](#convolutional-neural-network)
+    - [Hyperparameters](#Hyperparameters)
 - [About the data splits and preprocessing](#about-the-data-splits-and-preprocessing)
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
   - [Results](#results)
