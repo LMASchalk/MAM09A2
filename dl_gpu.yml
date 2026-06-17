@@ -1,0 +1,17 @@
+name: dl_gpu
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.12.7
+  - pip
+  - numpy
+  - matplotlib
+  - scikit-learn
+  - joblib
+  - pytorch=2.5.0
+  - torchvision=0.20.0
+  - pytorch-cuda=11.8
+  - pip:
+      - medmnist>=3.0.0

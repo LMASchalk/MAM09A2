@@ -210,14 +210,14 @@ Interesting to note is the performance on drusen, it seems to be low on all mode
 ## How to run
 These instructions apply specifically to the UvA Snellius server
 ### Environment setup. 
-1. Pull the following repository: https://github.com/uvadlc/uvadlc_practicals_2025
-2. Then run sbatch src/bashrunscripts/install_environment.job
+1. Pull this repository from Github (https://github.com/LMASchalk/MAM09A2.git) into your home directory.
+2. Run `bash ~/MAM09A2/src/bashrunscripts/setup_env.sh`
 
 ### Downloading the dataset
-Run sbatch src/bashrunscripts/make_dataset.job
+Run `bash ~/MAM09A2/src/bashrunscripts/make_dataset.sh`
 
 ### Training for machine learning
-Run sbatch src/bashrunscripts/fit_linearSVC.job
+Run `sbatch ~/MAM09A2/src/bashrunscripts/fit_linearSVC.job`
 
 ### Training for Deep learning 
-Run sbatch src/bashrunscripts/fit_deeplearning.job
+Run `sbatch ~/MAM09A2/src/bashrunscripts/fit_deeplearning.job`

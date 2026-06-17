@@ -1,0 +1,16 @@
+name: dl_cpu
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.12.7
+  - pip
+  - numpy
+  - matplotlib
+  - scikit-learn
+  - joblib
+  - pytorch=2.5.0
+  - torchvision=0.20.0
+  - cpuonly
+  - pip:
+      - medmnist>=3.0.0
