@@ -1,9 +1,10 @@
 #!/bin/bash
-#SBATCH --partition=rome
+#SBATCH --partition=gpu_a100
+#SBATCH --gpus-per-task=1
 #SBATCH --job-name=FitDeepLearning
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=9
-#SBATCH --time=01:00:00
+#SBATCH --time=03:00:00
 #SBATCH --output=slurm_fit_dl_%A.out
 # Snellius: train the deep learning model (GPU).
 # Submit with: sbatch fit_deeplearning.job
@@ -17,3 +18,4 @@ conda activate dl_gpu
 
 cd "$HOME/MAM09A2"
 python src/models/fit_deeplearning.py --modeltype "CNN" --epochs 40
+# change fit_deeplearning.py for hyperparameter_search.py to perform a hyperparameter search instead of training a single model.

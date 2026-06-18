@@ -27,12 +27,12 @@ def parse_args():
         help="Image size to use for OCTMNIST. Choices are: 244,128,64,28 (Default)",
     )
     
-    parser.add_argument(
-        "--modelname",
-        type=str,
-        default="MAM09A2",          
-        help="The name of the saved model. Default: MAM09A2",
-    )
+    # parser.add_argument(
+    #     "--modelname",
+    #     type=str,
+    #     default="MAM09A2",          
+    #     help="The name of the saved model. Default: MAM09A2",
+    # )
 
     parser.add_argument(
         "--modeltype",
@@ -44,7 +44,7 @@ def parse_args():
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=64,
+        default=128,
         help="Batch size for training",
     )
 
@@ -77,12 +77,14 @@ def main():
     # Reproducability
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    np.random.seed(seed)    
+    np.random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False    
     
     # Unpack arguments
     args = parse_args()
     size = args.size
-    name = args.modelname
+    # name = args.modelname
     modeltype = args.modeltype
     batch_size = args.batch_size
     lr = args.lr
@@ -96,12 +98,15 @@ def main():
     print("Dataset loaded!")
     
     # Initialize the dataloader. This class handles the batch generation. 
+    g = torch.Generator()
+    g.manual_seed(seed)
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
         num_workers=4,      # TODO: adjust for your server
         pin_memory=True,    # good with GPU
+        generator=g         # ensures reproducible shuffling
     )
 
     val_loader = DataLoader(
@@ -130,12 +135,18 @@ def main():
         model = SimpleCNN(num_classes=num_classes,image_size = size).to(device)  
         print("CNN Initialized!")  
     
-    criterion = nn.CrossEntropyLoss()
+    counts = np.bincount(train_dataset.labels, minlength=num_classes)
+    class_weights = torch.tensor(
+        counts.sum() / (num_classes * counts),
+        dtype=torch.float32,
+        device=device,
+    )
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     print(f"The loss function is: {criterion}")
     optimizer = optim.Adam(
         model.parameters(),
         lr=lr,
-        weight_decay=1e-4
+        weight_decay=1e-5
     )
     print(f"The optimizer is: {optimizer}")
     early_stopping = EarlyStopping(patience=5, delta=0.01)

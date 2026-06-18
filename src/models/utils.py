@@ -34,7 +34,7 @@ class OCTMNISTDataset(Dataset):
 
     def __getitem__(self, idx):
         # images assumed to be (H, W) grayscale; adjust if different
-        img = self.images[idx].astype(np.float32)
+        img = self.images[idx].astype(np.float32) / 255.0
         label = int(self.labels[idx])
 
         # Add channel dimension: (1, H, W)

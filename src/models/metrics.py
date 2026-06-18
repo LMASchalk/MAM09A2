@@ -19,6 +19,7 @@ from sklearn.metrics import (
     f1_score,
     recall_score,
     roc_auc_score,
+    confusion_matrix,
 )
 
 CLASS_LABELS = [0, 1, 2, 3]
@@ -43,6 +44,7 @@ def compute_metrics(y_true, y_pred, y_score, labels=CLASS_LABELS):
             y_true, y_pred, average="macro", labels=labels),
         "per_class_recall": recall_score(
             y_true, y_pred, average=None, labels=labels),
+        "confusion_matrix": confusion_matrix(y_true, y_pred, labels=labels),
     }
 
 
@@ -96,4 +98,9 @@ def format_metrics(metrics, labels=CLASS_LABELS):
     for i, label in enumerate(labels):
         name = CLASS_NAMES.get(label, str(label))
         lines.append(f"  {name}: {metrics['per_class_recall'][i]:.4f}")
+    cm = metrics["confusion_matrix"]
+    lines.append("Confusion matrix (rows=true, cols=pred):")
+    for label, row in zip(labels, cm):
+        name = CLASS_NAMES.get(label, str(label))
+        lines.append(f"  {name}: {row.tolist()}")
     return "\n".join(lines)
