@@ -108,13 +108,7 @@ def write_report(path, best_c, sweep, test_metrics):
         lines.append(f"| {c:g}{mark} | {bacc:.4f} |")
     lines.append("")
     lines.append("## Test set (evaluated once)")
-    lines.append(f"- Accuracy: {test_metrics['accuracy']:.4f}")
-    lines.append(f"- AUC: {test_metrics['macro_auc']:.4f}")
-    lines.append(f"- Macro-F1: {test_metrics['macro_f1']:.4f}")
-    lines.append("- Per-class recall:")
-    for i, k in enumerate(metrics.CLASS_LABELS):
-        recall = test_metrics["per_class_recall"][i]
-        lines.append(f"    - {metrics.CLASS_NAMES[k]}: {recall:.4f}")
+    lines.append(metrics.format_metrics(test_metrics))
     lines.append("")
     text = "\n".join(lines)
     path.write_text(text)

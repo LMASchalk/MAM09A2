@@ -14,6 +14,7 @@
 - [About the data splits and preprocessing](#about-the-data-splits-and-preprocessing)
 - [Final Evaluation on the Test Set](#final-evaluation-on-the-test-set)
   - [Results](#results)
+    - [Confusion matrices](#confusion-matrices)
 - [Discussion](#Discussion)
     - [Limitations](#Limitations)
     - [Future implementations](#Future-implementations)
@@ -70,7 +71,7 @@ We use the official MedMNIST train/validation/test splits rather than resampling
 
 The training and validation sets are class-imbalanced (47.2% normal, 34.4% CNV, 10.5% DME, and 8.0% drusen) while the test set is balanced at 250 images per class (25% each). We address the training imbalance through class weighting in the models rather than altering the splits, and we report per-class metrics because the train/test distribution mismatch means overall accuracy alone can hide poor performance on the minority classes.
 
-MedMNIST provides the images already centre-cropped and resized to a fixed square resolution (we use 28×28) with intensities as 8-bit grayscale; "preprocessed" here refers to that standardisation from the original heterogeneous OCT scans. Our pipeline adds only the model-specific steps applied per split: flattening and feature scaling for the classical baseline, and tensor conversion.
+MedMNIST provides the images already centre-cropped and resized to a fixed square resolution (we use 28×28) with intensities as 8-bit grayscale; "preprocessed" here refers to that standardisation from the original heterogeneous OCT scans. Our pipeline adds only the model-specific steps applied per split. For the classical baseline, flattening and `MinMaxScaler` feature scaling to [0, 1]. For the networks, conversion to tensors with pixel intensities divided by 255 so that inputs also lie in [0, 1]. Both approaches therefore receive inputs on the same [0, 1] scale.
 
 ## About the methods
 *This section gives a short explanation and reasoning for the selected methods for both the machine learning and deep learning approaches. The goal is to be able to evaluate the effectiveness of the deep learning approach by comparing it to the conventional machine learning method.*
@@ -87,6 +88,8 @@ The regularisation strength `C`, which controls the trade-off between a wide mar
 
 ### Deep learning
 For the classification task two different Deep Learning archetypes were used, MultiLayer Perceptron and Convolutional Neural Network. The specifics of how the two archetypes are implemented will be discussed in the next sections. The optimizer, loss function and regularization are the same for both experiments. **Optimizer: Adam** (Often used since it is computationally efficient and able to deal with pathological curvatures in the gradient. However, Adam does often tend to find minima that are more extreme and other optimizers such as stochastic gradient descent with momentum often find more flatter minima which is leads to better generalisation), **Loss function: CrossEntropy** (Good for classification due to the shape of the loss function exploding at 0) and **Regularization: Early stopping and L2**. 
+
+Both networks address the training-set class imbalance the same way the baseline does: the cross-entropy loss is weighted by inverse class frequency (`n_samples / (n_classes * count)`), the direct analogue of the LinearSVC's `class_weight="balanced"`. This keeps the imbalance handling symmetric across the two approaches, so the rarer drusen and DME classes are not drowned out by the common classes during training.
 
 #### MultiLayer Perceptron
 A MultiLayer Perceptron (MLP) is the simplest for of a neural net. Ours consist of two fully connected ReLu layers. With the first layer containing 512 hidden units and the second layer containing 256 hidden units. These numbers were chosen in order to roughly match the amount of weights in the CNN running on 28x28 images. 
@@ -124,68 +127,90 @@ The feature extraction blocks finds features within the image, in this case set 
 
 #### Hyperparameters
 
-We decided to tune on two hyperparameters (Learning Rate and L2 Lambda). We did this for three different values (1e3/4/5) of both parameter leading to nine different combinations of these parameters. Then we picked the model that performed the best on the validation set based on the accuracy. This resulted in:
+We tuned three hyperparameters: the learning rate, the L2 lambda (the `weight_decay` of the Adam optimiser) and the batch size. Each was tried at three values, giving 3 × 3 × 3 = 27 combinations. Every combination is trained on the training split and scored on the official validation split, and the combination with the highest validation accuracy is selected; the test set is never used for this choice. The candidate values were learning rate {1e-2, 1e-3, 1e-4}, L2 lambda {1e-3, 1e-4, 1e-5} and batch size {32, 64, 128}.
+
+The search is run by `hyperparameter_search.py`, which writes a ranked table to `reports/<modeltype>_<size>_sweep.md`. Each combination is re-seeded identically, so runs differ only by the hyperparameters under test. The best combination per model was:
 
 | Hyperparameter | MLP | CNN |
 |---|---|---|
 | Learning Rate | 1e-4 | 1e-4 |
-| L2 lambda | 1e-5 | 1e-3 |
+| L2 lambda | 1e-5 | 1e-5 |
+| Batch size | 32 | 128 |
 
-Other hyperparameters were kept the same and were not tuned: 
+The only hyperparameter not tuned is the max number of training epochs, which acts as an early-stopping ceiling rather than a fixed run length:
 
-Batch size: 64
-
-Epochs: 30
+Epochs (early-stopping ceiling): 40
 
 ## Final Evaluation on the Test Set
 
-Both models are evaluated on the official MedMNIST test set (1,000 images,
-250 per class), used exactly once after all model selection and tuning is
-complete. The same evaluation code and the same metrics are applied to both
-models, so the comparison is like-for-like.
+Both models are evaluated on the official MedMNIST test set (1,000 images, 250 per class), used exactly once after all model selection and tuning is complete. The same evaluation code and the same metrics are applied to both models, so the comparison is like-for-like.
 
 We report four metrics:
 
-- **Accuracy (ACC)** - the fraction of test images classified correctly. A
-  MedMNIST standard metric, so it is directly comparable to published OCTMNIST
-  benchmarks; because the test set is balanced, it is not skewed toward any
+- **Accuracy (ACC)** - the fraction of test images classified correctly. A MedMNIST standard metric, so it is directly comparable to published OCTMNIST benchmarks; because the test set is balanced, it is not skewed toward any
   single class.
-- **AUC** - area under the ROC curve (one-vs-rest). It is
-  threshold-independent, measuring how well the model ranks each class against
-  the rest rather than judging a single hard decision. Also a MedMNIST standard
-  metric, included for comparability.
-- **Macro-F1** - the harmonic mean of precision and recall, averaged equally
-  across the four classes. Unlike accuracy, it penalises a model that
-  over-predicts the majority classes, so it captures minority-class failure in
-  a single number. (Micro-F1 is not reported separately, as it is equal to
-  accuracy for single-label classification.)
-- **Per-class recall** - for each disease, the fraction of its true cases the
-  model identified. This is our diagnostic metric: it shows precisely which
-  classes are handled well and which are missed, which the aggregate scores
+- **AUC** - area under the ROC curve (one-vs-rest). It is threshold-independent, measuring how well the model ranks each class against
+  the rest rather than judging a single hard decision. Also a MedMNIST standard metric, included for comparability.
+- **Macro-F1** - the harmonic mean of precision and recall, averaged equally across the four classes. Unlike accuracy, it penalises a model that over-predicts the majority classes, so it captures minority-class failure in a single number. (Micro-F1 is not reported separately, as it is equal to accuracy for single-label classification.)
+- **Per-class recall** - for each disease, the fraction of its true cases the model identified. This is our diagnostic metric: it shows precisely which classes are handled well and which are missed, which the aggregate scores
   cannot reveal.
 
-The first two provide comparability with the MedMNIST benchmark; the last two
-expose the per-class behaviour that matters given the class imbalance in the
-training data.
+The first two provide comparability with the MedMNIST benchmark; the last two expose the per-class behaviour that matters given the class imbalance in the training data.
 
 ### Results
 
-| Metric | LinearSVC baseline (c = 1.0) | CNN |MLP|
-|---|---|---|---|
-| Accuracy (ACC) | 0.3510 | 0.6830 |0.5820|
-| AUC (OvR) | 0.6271 | 0.9258 |0.8629|
-| Macro-F1 | 0.2560 | 0.6399 |0.5147|
+All results below were produced on the Snellius cluster: the LinearSVC baseline (`fit_linearsvc`) on the `rome` CPU partition, and both networks (`fit_deeplearning`) on the `gpu_a100` GPU partition. The following numbers come from the final implementations of the fit_*.py scripts. Each run writes its outputs to:
+* `reports/<modeltype>_<size>_metrics.md`
+* `reports/<modeltype>_<size>_learning_curves.png` (MLP / CNN)
+* `models/<modeltype>_<size>.joblib` (LinearSVC) OR `models/<modeltype>_<size>.pt` (MLP / CNN)
 
-**The state of the art model for this classification task is currently ResNet-50 (28x28) and has an ACC of 0.762. Our initial simple CNN already reaches 90.2% of the performance compared to the state of the art**
+| Metric | LinearSVC | MLP | CNN |
+|---|---|---|---|
+| Accuracy (ACC) | 0.3520 | 0.6310 | 0.7350 |
+| AUC (OvR) | 0.6272 | 0.8578 | 0.9318 |
+| Macro-F1 | 0.2566 | 0.6256 | 0.7228 |
+
+**The state of the art model for this classification task is currently ResNet-50 (28x28) and has an ACC of 0.762. Our initial simple CNN already reaches >95% of the performance compared to the state of the art**
 
 Per-class recall:
 
-| Class | LinearSVC baseline (c = 1.0) | CNN |MLP|
+| Class | LinearSVC | MLP | CNN |
 |---|---|---|---|
-| CNV | 0.7760 | 0.9400 |0.8520|
-| DME | 0.0400 | 0.7000 |0.5720|
-| drusen | 0.0160 | 0.1760 |0.0400|
-| normal | 0.5720 | 0.9160 |0.8640|
+| CNV | 0.7760 | 0.6680 | 0.9160 |
+| DME | 0.0400 | 0.7680 | 0.8320 |
+| drusen | 0.0160 | 0.4320 | 0.4400 |
+| normal | 0.5720 | 0.6560 | 0.7520 |
+
+#### Confusion matrices
+
+Rows are the true class, columns the predicted class, in the order CNV, DME, drusen, normal (matching `CLASS_LABELS` in `metrics.py`). The test set is balanced, so every row sums to 250; the diagonal is the per-class recall count, and reading across a row shows where each class's errors land.
+
+**LinearSVC baseline (C = 1.0)**
+
+| true \ pred | CNV | DME | drusen | normal |
+|---|---|---|---|---|
+| CNV    | 194 | 6 | 0 | 50 |
+| DME    | 151 | 10 | 7 | 82 |
+| drusen | 146 | 2 | 4 | 98 |
+| normal | 101 | 3 | 2 | 144 |
+
+**MLP**
+
+| true \ pred | CNV | DME | drusen | normal |
+|---|---|---|---|---|
+| CNV    | 167 | 55 | 17 | 11 |
+| DME    | 28 | 192 | 13 | 17 |
+| drusen | 55 | 19 | 108 | 68 |
+| normal | 17 | 10 | 59 | 164 |
+
+**CNN**
+
+| true \ pred | CNV | DME | drusen | normal |
+|---|---|---|---|---|
+| CNV    | 229 | 15 | 4 | 2 |
+| DME    | 28 | 208 | 11 | 3 |
+| drusen | 61 | 23 | 110 | 56 |
+| normal | 8 | 28 | 26 | 188 |
 
 The learning loss and accuracy curves on the validation set can be found in reports/..._learning_curves.png
 
@@ -198,20 +223,16 @@ Interesting to note is the performance on drusen, it seems to be low on all mode
 
 ### Limitations
 
-- **Preprocessing is not symmetric across the two models.** The LinearSVC pipeline scales its inputs to [0, 1] via `MinMaxScaler`, but the deep-learning dataset feeds raw 0–255 pixel values to the network. The *evaluation* protocol is shared, but the input preprocessing is not, which is a caveat on the strict "like-for-like" comparison.
 - **The CNN has no normalisation or regularisation layers** (no BatchNorm, no Dropout) beyond weight decay, and uses a fixed learning rate with no scheduler.
 - **Early stopping monitors validation loss**, not the metric we actually report (AUC / accuracy); on imbalanced data these can diverge, so the checkpointed model is "best" by loss rather than by the reported metric.
-- **Reproducibility is only partially pinned.** Global seeds are set, but the training `DataLoader` shuffles with multiple workers without a fixed generator, and cuDNN determinism is not enforced, so runs are not bit-reproducible.
+- **Reproducibility is pinned for the training shuffle and cuDNN.** Global seeds are set, the training `DataLoader` uses a fixed `Generator`, and `cudnn.deterministic` is enabled. Full bitwise determinism on GPU is still not guaranteed, since some CUDA kernels remain non-deterministic unless `torch.use_deterministic_algorithms(True)` is also set.
 - **Results are from a single seed and a single test pass**, with no error bars.
 
 
 ### Future implementations
 
-- **Weight the CNN loss by class frequency** (or use a weighted sampler), mirroring the baseline's `class_weight="balanced"`, and report whether this moves drusen/DME recall - this would isolate the imbalance effect from the resolution effect.
-- **Normalise the network inputs** so preprocessing matches the baseline.
 - Build a **stronger, fairer baseline**: e.g., PCA-whitened features feeding a linear or RBF SVM.
 - **Repeat the CNN over several seeds** to obtain error bars on the reported metrics.
-- Proper **hyperparameter tuning for the CNN**.
 - **Training on the higher-dimension images** (requires changes to the architecture and possibly the regularisation), which directly addresses the resolution hypothesis for drusen.
 - **Creation of synthetic data** to create a more equal class distribution.
 - Add **BatchNorm, Dropout, and a learning-rate scheduler**, and switch early stopping to monitor the reported metric.
@@ -219,19 +240,15 @@ Interesting to note is the performance on drusen, it seems to be low on all mode
 
 ## How to run
 
-The project can be run on the UvA Snellius cluster (GPU) or on a local
-machine (CPU). Follow the section matching your setup.
+The repository is organised into three main directories: src/ holds all the models and their associated modules, reports/ collects the outcomes (metric tables, sweep results, and learning-curve figures) in a readable form, and models/ stores the trained model files themselves.
 
-In both cases, **run every command from the repository root** so that the
-relative paths inside the scripts resolve correctly.
+The project can be run on the UvA Snellius cluster (GPU) or on a local machine (CPU). Follow the section matching your setup.
+
+In both cases, **run every command from the repository root** so that the relative paths inside the scripts resolve correctly.
 
 ### A. Snellius cluster
 
-Two of the steps below need internet access and must be run **directly on a
-login node** (the shell you get right after `ssh`), not submitted with
-`sbatch`. Compute nodes have no internet, so submitting these would fail.
-The two training steps are the opposite: they are submitted with `sbatch`
-to run on compute nodes.
+Two of the steps below need internet access and must be run **directly on a login node** (the shell you get right after `ssh`), not submitted with `sbatch`. Compute nodes have no internet, so submitting these would fail. The two training steps are the opposite: they are submitted with `sbatch` to run on compute nodes.
 
 #### 1. Get the repository
 SSH into Snellius, then clone this repository into your home directory:
@@ -243,15 +260,13 @@ git clone https://github.com/LMASchalk/MAM09A2.git ~/MAM09A2
 ```
 bash src/bashrunscripts/setup_env.sh
 ```
-This creates the `dl_gpu` conda environment from `dl_gpu.yml`. A harmless SURF
-warning about conda may appear. This step takes a while.
+This creates the `dl_gpu` conda environment from `dl_gpu.yml`. A harmless SURF warning about conda may appear. This step takes a while.
 
 #### 3. Download the dataset (login node)
 ```
 bash src/bashrunscripts/make_dataset.sh
 ```
-Run this once. The dataset is then cached locally and read offline by the
-training jobs.
+Run this once. The dataset is then cached locally and read offline by the training jobs.
 
 #### 4. Train the machine learning baseline (compute node)
 ```
@@ -262,16 +277,14 @@ sbatch src/bashrunscripts/fit_linearSVC.job
 ```
 sbatch src/bashrunscripts/fit_deeplearning.job
 ```
+Change the `--modeltype "CNN"` to `--modeltype "MLP"` to get the corresponding model.
 
 ### B. Local machine (no cluster)
 
 **Prerequisite:** a working conda installation (Miniconda or Anaconda) that
-is initialized in your shell. If `conda` is not found, install Miniconda
-first (https://www.anaconda.com/docs/getting-started/miniconda/install/overview), open a new terminal, and continue. The setup script checks for this and will tell you
-if conda is missing. `conda` has to be placed in your PATH.
+is initialized in your shell. If `conda` is not found, install Miniconda first (https://www.anaconda.com/docs/getting-started/miniconda/install/overview), open a new terminal, and continue. The setup script checks for this and will tell you if conda is missing. `conda` has to be placed in your PATH.
 
-The login-node / compute-node distinction does not apply locally: your
-machine has internet throughout, so every step is a normal `bash` run.
+The login-node / compute-node distinction does not apply locally: your machine has internet throughout, so every step is a normal `bash` run.
 
 #### 1. Get the repository
 ```
@@ -299,5 +312,6 @@ bash src/bashrunscripts/fit_linearsvc.sh
 ```
 bash src/bashrunscripts/fit_deeplearning.sh
 ```
-This runs on CPU. At 28x28 it is slow but adequate for verifying the
-pipeline end to end before moving to the cluster for a full run.
+Change the `--modeltype "CNN"` to `--modeltype "MLP"` to get the corresponding model.
+
+This runs on CPU. At 28x28 it is slow but adequate for verifying the pipeline end to end before moving to the cluster for a full run.

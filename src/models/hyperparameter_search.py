@@ -5,8 +5,9 @@ from torch import nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from pathlib import Path
+import argparse
 
-from utils import npz_filename,OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,find_availableName,EarlyStopping,run_tag,
+from utils import npz_filename,OCTMNISTDataset,SimpleMLP,SimpleCNN,train_one_epoch,evaluate,find_availableName,EarlyStopping,run_tag
 
 # Same paths as fit_deeplearning.py
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -16,13 +17,24 @@ REPORTS_DIR = REPO_ROOT / "reports"
 # Config block.
 SEED = 42
 SIZE = 28
-MODELTYPE = "CNN"   # MLP or CNN
 EPOCHS = 40
 
 # Sweep grids. Total runs = product of the three lengths.
 LEARNING_RATES = [1e-2, 1e-3, 1e-4]
 WEIGHT_DECAYS = [1e-3, 1e-4, 1e-5]   # L2 lambda for Adam
 BATCH_SIZES = [32, 64, 128]
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--modeltype",
+        type=str,
+        default="MLP",
+        choices=["MLP", "CNN"],
+        help="The type of deep learning model, Options: MLP (Default), CNN",
+    )
+    return parser.parse_args()
 
 
 def set_seed(seed):
@@ -119,6 +131,9 @@ def write_sweep_report(results):
 
 
 def main():
+    global MODELTYPE
+    MODELTYPE = parse_args().modeltype
+    
     print("Starting sweep ...")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

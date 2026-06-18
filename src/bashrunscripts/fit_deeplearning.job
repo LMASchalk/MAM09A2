@@ -17,5 +17,5 @@ eval "$(conda shell.bash hook)"
 conda activate dl_gpu
 
 cd "$HOME/MAM09A2"
-python src/models/fit_deeplearning.py --modeltype "CNN" --epochs 40
+python src/models/fit_deeplearning.py --modeltype "MLP" --epochs 40
 # change fit_deeplearning.py for hyperparameter_search.py to perform a hyperparameter search instead of training a single model.

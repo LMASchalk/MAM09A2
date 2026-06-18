@@ -16,11 +16,16 @@
 | 1 **(selected)** | 0.6671 |
 
 ## Test set (evaluated once)
-- Accuracy: 0.3520
-- AUC: 0.6272
-- Macro-F1: 0.2566
-- Per-class recall:
-    - choroidal neovascularization (CNV): 0.7760
-    - diabetic macular edema (DME): 0.0400
-    - drusen: 0.0160
-    - normal: 0.5760
+Accuracy:        0.3520
+Macro AUC (OvR): 0.6272
+Macro F1:        0.2566
+Per-class recall:
+  choroidal neovascularization (CNV): 0.7760
+  diabetic macular edema (DME): 0.0400
+  drusen: 0.0160
+  normal: 0.5760
+Confusion matrix (rows=true, cols=pred):
+  choroidal neovascularization (CNV): [194, 6, 0, 50]
+  diabetic macular edema (DME): [151, 10, 7, 82]
+  drusen: [146, 2, 4, 98]
+  normal: [101, 3, 2, 144]
