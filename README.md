@@ -294,7 +294,7 @@ cd MAM09A2
 
 #### 2. Environment setup
 ```
-bash src/bashrunscripts/setup_env.sh
+bash src/bashrunscripts/setup_env_local.sh
 ```
 This creates the `dl_cpu` conda environment from `dl_cpu.yml`.
 
